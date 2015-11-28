@@ -1,0 +1,4 @@
+exoverride_controller:
+    resource: "@CPASimUSanteExoverrideBundle/Controller/ExoverrideController.php"
+    type: annotation
+    prefix: /
