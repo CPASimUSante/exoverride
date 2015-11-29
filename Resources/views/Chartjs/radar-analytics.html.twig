@@ -1,0 +1,25 @@
+{% set layout = "ClarolineCoreBundle:Workspace:layout.html.twig" %}
+
+{% if isDesktop() %}
+    {% set layout = "ClarolineCoreBundle:Desktop:layout.html.twig" %}
+{% endif %}
+
+{% extends layout %}
+
+{% block title %}Chartjs{% endblock %}
+
+{% block section_content %}
+    <div class="panel-heading">
+        <h3 class="panel-title">Chartjs</h3>
+    </div>
+
+    <div class="panel-body">
+        {% include "CPASimUSanteExoverrideBundle:Chartjs:show.html.twig" %}
+    </div>
+    <div class="panel-footer"></div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% include "CPASimUSanteChartjsBundle:Chartjs:chartjs.js.twig' %}
+{% endblock %}

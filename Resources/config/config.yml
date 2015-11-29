@@ -1,2 +1,6 @@
 plugin:
     has_options: false
+    widgets:
+      - name: exo_stat
+        is_configurable: true
+        is_exportable: true
