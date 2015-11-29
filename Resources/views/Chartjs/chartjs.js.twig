@@ -26,7 +26,9 @@
         ]
     };
     $(document).ready(function() {
-        var radar = new Chart($("#canvas-radar").getContext("2d")).Radar(radarChartData, {
+        /* can't use getContext on jQuery object. Must find undelying DOM object */
+        var canvas = $(this).find('canvas.radaranalytics')[0];
+        var radar = new Chart(canvas.getContext("2d")).Radar(radarChartData, {
             responsive: true
         });
     });

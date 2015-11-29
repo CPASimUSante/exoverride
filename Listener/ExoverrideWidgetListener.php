@@ -22,13 +22,7 @@ use JMS\DiExtraBundle\Annotation as DI;
  */
 class ExoverrideWidgetListener
 {
-    /**
-     * @var
-     */
     private $httpKernel;
-    /**
-     * @var
-     */
     private $request;
 
     /**
@@ -42,14 +36,14 @@ class ExoverrideWidgetListener
         HttpKernelInterface $httpKernel
     )
     {
-        $this->httpKernel = $httpKernel;
-        $this->request = $requestStack->getCurrentRequest();
+        $this->httpKernel   = $httpKernel;
+        $this->request      = $requestStack->getCurrentRequest();
     }
 
     /**
      * Listener to the widget display
      *
-     * @DI\Observe("widget_cpasimusante_userstat_widget")
+     * @DI\Observe("widget_exo_stat")
      * @param DisplayWidgetEvent $event
      */
     public function onDisplay(DisplayWidgetEvent $event)
@@ -63,7 +57,7 @@ class ExoverrideWidgetListener
 
     /**
      * Widget configuration
-     * @DI\Observe("widget_simusante_userstat_widget_configuration")
+     * @DI\Observe("widget_exo_stat_configuration")
      * @param ConfigureWidgetEvent $event
      */
     public function onConfigure(ConfigureWidgetEvent $event)
