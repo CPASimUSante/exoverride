@@ -3,6 +3,8 @@
 namespace CPASimUSante\ExoverrideBundle\Controller;
 
 use Claroline\CoreBundle\Manager\UserManager;
+use CPASimUSante\ExoverrideBundle\Entity\ExoverrideStatConfig;
+use CPASimUSante\ExoverrideBundle\Form\ExoverrideStatConfigType;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Claroline\CoreBundle\Entity\Widget\WidgetInstance;
 use JMS\DiExtraBundle\Annotation as DI;
@@ -13,6 +15,8 @@ use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\HttpFoundation\Request;
 
 class ExoverrideWidgetController extends Controller
 {
@@ -20,6 +24,7 @@ class ExoverrideWidgetController extends Controller
     private $formFactory;
     private $userManager;
     private $request;
+
     /**
      * @DI\InjectParams({
      *     "om"                    = @DI\Inject("claroline.persistence.object_manager"),
@@ -27,6 +32,10 @@ class ExoverrideWidgetController extends Controller
      *     "userManager"           = @DI\Inject("claroline.manager.user_manager"),
      *     "requestStack"          = @DI\Inject("request_stack"),
      * })
+     * @param ObjectManager $om
+     * @param FormFactory $formFactory
+     * @param UserManager $userManager
+     * @param RequestStack $requestStack
      */
     public function __construct(
         ObjectManager $om,
@@ -75,8 +84,24 @@ class ExoverrideWidgetController extends Controller
      * @EXT\ParamConverter("authenticatedUser", options={"authenticatedUser" = true})
      * @EXT\Template("CPASimUSanteExoverrideBundle:Widget:statWidgetConfigure.html.twig")
      */
-    public function userStatWidgetConfigureFormAction(WidgetInstance $widgetInstance)
+    public function userStatWidgetConfigureFormAction(WidgetInstance $widgetInstance, Request $request)
     {
-        return array('widgetInstance' => $widgetInstance);
+        if (!$this->get('security.authorization_checker')->isGranted('edit', $widgetInstance)) {
+            throw new AccessDeniedException();
+        }
+
+        $form = $this->formFactory->create(new ExoverrideStatConfigType());
+        $form->handleRequest($request);
+
+        if ($form->isValid()) {
+            $em = $this->get('doctrine.orm.entity_manager');
+            $em->persist($widgetInstance);
+            $em->flush();
+        }
+
+        return array(
+            'widgetInstance' => $widgetInstance,
+            'form' => $form->createView(),
+        );
     }
 }

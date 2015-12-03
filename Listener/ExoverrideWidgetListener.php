@@ -27,8 +27,8 @@ class ExoverrideWidgetListener
 
     /**
      * @DI\InjectParams({
-     *  "requestStack"= @DI\Inject("request_stack"),
-     *  "httpKernel"= @DI\Inject("http_kernel")
+     *  "requestStack"      = @DI\Inject("request_stack"),
+     *  "httpKernel"        = @DI\Inject("http_kernel"),
      * })
      */
     public function __contruct(

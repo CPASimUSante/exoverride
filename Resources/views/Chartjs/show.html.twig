@@ -1,1 +1,4 @@
-<canvas id="canvas-radar" class="radaranalytics" style="width:300px;height: 300px"></canvas>
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ asset('bundles/cpasimusanteexoverride/css/chartjs.css') }}">
+{% endblock %}
+<canvas id="canvas-radar" class="radaranalytics"></canvas>
