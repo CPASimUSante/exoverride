@@ -1,0 +1,3 @@
+ujm_paper_export_complete_results:
+    pattern:  /export/complete_results/csv/{exerciseId}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:exportResCompleteCSV" }
