@@ -64,16 +64,10 @@ class PaperController extends BaseController
         $em = $this->getDoctrine()->getManager();
         //get the Exercise entity
         $exercise = $em->getRepository('UJMExoBundle:Exercise')->find($exerciseId);
-/*
-SELECT u0_.id AS id0, u0_.ip AS ip1, u0_.mark AS mark2, u0_.nb_tries AS nb_tries3, u0_.response AS response4,
-u0_.paper_id AS paper_id5, u0_.interaction_id AS interaction_id6
-FROM ujm_response u0_
-INNER JOIN ujm_paper u1_ ON u0_.paper_id = u1_.id
-INNER JOIN ujm_exercise u2_ ON u1_.exercise_id = u2_.id
-WHERE u2_.id = ? AND u1_.interupt = ? GROUP BY u1_.id
-*/
-$choice = array();
-$choicetmp = array();
+
+        //list of labels for Choice
+        $choicetmp = array();
+
         if ($this->container->get('ujm.exercise_services')->isExerciseAdmin($exercise)) {
             $iterableResult = $this->getDoctrine()
                 ->getManager()
@@ -119,7 +113,7 @@ $choicetmp = array();
 
                 //get the result for responses for an exercise
 
-                //can't get the ujm_choice directlty in the first query (string with ;)
+                //can't get the ujm_choice directly in the first query (string with ;)
                 $choice = array();
                 $choiceIds = array_filter(explode(";",$row2->getResponse()), 'strlen'); //to avoid empty value
                 foreach ($choiceIds as $cid)
@@ -135,12 +129,13 @@ $choicetmp = array();
                         $choice[] = $choicetmp[$cid];
                     }
                 }
-
+                //Create an array for each response from a user
                 $arr_tmp = array(
-                    //$row2->getResponse(),     //dont't want to display choices ids : get labels instead
+                    //$row2->getResponse(),     //don't want to display choices ids : get labels instead
                     $choice,
                     $row2->getMark(),
                     $row2->getNbTries(),
+                    $row2->getInteraction()->getQuestion()->getTitle(),
 
                 );
                 $results2[$paper][] = $arr_tmp;
@@ -161,7 +156,7 @@ $choicetmp = array();
                     '_resource' => $exercise,
                     'results'   => $results,
                     'results2'  => $results2,
-                    'choice'    => $choice,
+                    'exercise'  => $exercise->getTitle(),
                 )
             );
             /*
