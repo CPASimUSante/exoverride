@@ -9,7 +9,7 @@ use UJM\ExoBundle\Entity\Response as BaseEntity;
  * UJM\ExoBundle\Entity\Response
  *
  * @ORM\Entity(repositoryClass="CPASimUSante\ExoverrideBundle\Repository\ResponseRepository")
- * @ORM\Table(name="ujm_response")
+ * @ORM\Table(name="ujm_exoverride_response")
  */
 class Response extends BaseEntity
 {
