@@ -79,6 +79,11 @@ class PaperController extends BaseController
             $results    = array();
             //results for responses for paper
             $results2   = array();
+            //mean for user for the exercise
+            $mean       = array();
+            $tmpmean    = array();
+            //general mean for the exercise
+            $galmean    = 0;
 
             while (false !== ($row = $iterableResult->next())) {
                 $rowCSV = array();
@@ -93,7 +98,10 @@ class PaperController extends BaseController
                 $infosPaper = $this->container->get('ujm.exercise_services')->getInfosPaper($row1);
                 $score = $infosPaper['scorePaper'] / $infosPaper['maxExoScore'];
                 $score = $score * 20;
+                //user id
+                $uid = $row1->getUser()->getId();
 
+                $rowCSV[] = $uid;
                 $rowCSV[] = $row1->getUser()->getLastName() . '-' . $row1->getUser()->getFirstName();
                 $rowCSV[] = $row1->getNumPaper();
                 $rowCSV[] = $row1->getStart()->format('Y-m-d H:i:s');
@@ -104,9 +112,6 @@ class PaperController extends BaseController
                 }
                 $rowCSV[] = $row1->getInterupt();
                 $rowCSV[] = $this->container->get('ujm.exercise_services')->roundUpDown($score);
-
-                //get the result for an exercise
-                $results[$paper] = $rowCSV;
 
                 //get Responses for this paper
                 $row2 = $row[0];
@@ -132,17 +137,48 @@ class PaperController extends BaseController
                 //Create an array for each response from a user
                 $arr_tmp = array(
                     //$row2->getResponse(),     //don't want to display choices ids : get labels instead
-                    $choice,
-                    $row2->getMark(),
-                    $row2->getNbTries(),
-                    $row2->getInteraction()->getQuestion()->getTitle(),
-
+                    'choice'    => $choice,
+                    'marks'     => $row2->getMark(),
+                    'tries'     => $row2->getNbTries(),
+                    'title'     => $row2->getInteraction()->getQuestion()->getTitle(),
                 );
+                if (!isset($tmpmean[$uid]))
+                {
+                    $tmpmean[$uid]['sum'] = $row2->getMark();
+                    $tmpmean[$uid]['count'] = 1;
+                }
+                else
+                {
+                    $tmpmean[$uid]['sum'] += $row2->getMark();
+                    $tmpmean[$uid]['count'] += 1;
+                }
+
                 $results2[$paper][] = $arr_tmp;
+
+                //get the result for an exercise
+                $results[$paper] = $rowCSV;
 
 //                fputcsv($handle, $rowCSV);
                 $em->detach($row[0]);
             }
+
+            foreach ($tmpmean as $uid => $m)
+            {
+                if (isset($m['count']))
+                {
+                    $mean[$uid] = $m['sum']/$m['count'];
+                }
+                else
+                {
+                    $mean[$uid] = 0;
+                }
+                $galmean += $mean[$uid];
+            }
+
+            if ($tmpmean != array())
+                $galmean = $galmean / count($tmpmean);
+            else
+                $galmean = 0;
 /*
             rewind($handle);
             $content = stream_get_contents($handle);
@@ -157,6 +193,8 @@ class PaperController extends BaseController
                     'results'   => $results,
                     'results2'  => $results2,
                     'exercise'  => $exercise->getTitle(),
+                    'mean'      => $mean,
+                    'galmean'   => $galmean,
                 )
             );
             /*

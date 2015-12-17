@@ -30,16 +30,23 @@
         </a>
         <hr>
         <h1>{{ exercise }}</h1>
+        <h6>General mean = {{ galmean }}</h6>
         <table class="table table-striped table-bordered table-condensed exo-results-all">
             <thead>
-                <tr><th>User</th><th>n° copie</th><th>Start</th><th>End</th><th>Interrompu</th><th>Score</th></tr>
+                <tr><th>User</th><th>n° copie</th><th>Start</th><th>End</th><th>Interrompu</th><th>Score</th><th>Mean</th></tr>
             </thead>
             <tbody>
 
             {% for paperid, result in results %}
-                <tr>{% for item in result %}<td>{{ item }}</td>{% endfor %}</tr>
+                {% set uid = result[0] %}
+                <tr>{% for k, item in result %}
+                        {% if k > 0 %}
+                    <td>{{ item }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    <td>{{ mean[uid] }}</td></tr>
                 <tr>
-                    <td colspan="6">
+                    <td colspan="7">
                         {# Begin response #}
                         <table class="table table-bordered table-condensed">
                             <thead>
@@ -48,14 +55,14 @@
                             <tbody>
                             {% for response in results2[paperid] %}
                                 <tr>
-                                    <td>{{ response[3] }}</td>
+                                    <td>{{ response['title'] }}</td>
                                     <td>
-                                        {% for choice in response[0] %}
+                                        {% for choice in response['choice'] %}
                                             {{ choice }},
                                         {% endfor %}
                                     </td>
-                                    <td>{{ response[1] }}</td>
-                                    <td>{{ response[2] }}</td>
+                                    <td>{{ response['marks'] }}</td>
+                                    <td>{{ response['tries'] }}</td>
                                 </tr>
                             {% endfor %}
                             </tbody>
