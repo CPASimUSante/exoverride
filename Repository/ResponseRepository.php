@@ -13,12 +13,53 @@ use UJM\ExoBundle\Repository\ResponseRepository as BaseRepository;
  */
 class ResponseRepository extends BaseRepository
 {
+    public function getQuerySomeExercisesAllResponsesForAllUsers($exercises=array())
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('r')
+            ->from('UJM\\ExoBundle\\Entity\\Response', 'r')
+            ->join('r.paper', 'p')
+            ->join('p.exercise', 'e')
+            ->where('e.id IN (?1)')
+            ->andWhere('p.interupt =  ?2')
+//            ->orderBy($order, 'ASC')
+            ->setParameters(array(1 => $exercises, 2 => 0));
+        return $qb->getQuery();
+    }
+    public function getSomeExerciseAllResponsesForAllUsersIterator($exercises)
+    {
+        return $this->getQuerySomeExercisesAllResponsesForAllUsers($exercises)->iterate();
+    }
+
+    public function getSomeExerciseAllResponsesForAllUsers($exercises)
+    {
+        return $this->getQuerySomeExercisesAllResponsesForAllUsers($exercises)->getResult();
+    }
+
+    public function getSomeExerciseAllResponsesForAllUsersAsArray($exercises)
+    {
+        return $this->getQuerySomeExercisesAllResponsesForAllUsers($exercises)->getArrayResult();
+    }
+
     /**
      *
      * @return array
      */
     public function getQueryExerciseAllResponsesForAllUsers($exoId, $order)
     {
+
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('r')
+            ->from('UJM\\ExoBundle\\Entity\\Response', 'r')     //thus, avoid problem with "overriding" Response entity in ExoverrideBundle
+            ->join('r.paper', 'p')
+            ->join('p.exercise', 'e')
+            ->where('e.id = ?1')
+            ->andWhere('p.interupt =  ?2')
+//            ->orderBy($order, 'ASC')
+            ->setParameters(array(1 => $exoId, 2 => 0));
+        return $qb->getQuery();
+
+/*
         $qb = $this->createQueryBuilder('r');
         $qb->join('r.paper', 'p')
             ->join('p.exercise', 'e')
@@ -27,6 +68,7 @@ class ResponseRepository extends BaseRepository
 //            ->orderBy($order, 'ASC')
             ->setParameters(array(1 => $exoId, 2 => 0));
         return $qb->getQuery();
+*/
     }
 
     public function getExerciseAllResponsesForAllUsersIterator($exoId, $order)

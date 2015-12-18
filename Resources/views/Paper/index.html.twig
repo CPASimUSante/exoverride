@@ -46,6 +46,10 @@
                  class="btn btn-primary">
                   {{ 'export_csv_all_results' | trans({}, 'messages') }}
               </a>
+            <a href="{{ path('ujm_paper_export_all_results', { }) }}"
+               class="btn btn-primary">
+                {{ 'export_csv_all_results2' | trans({}, 'messages') }}
+            </a>
             {% if _resource.published == FALSE %}
                 <a href="{{ path('ujm_exercise_delete_all_paper', { 'id': exoID }) }}"
                    class="btn btn-primary">
