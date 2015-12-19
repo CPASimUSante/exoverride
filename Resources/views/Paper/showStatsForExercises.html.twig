@@ -20,14 +20,16 @@
     </div>
 
     <div class="panel-body">
-        {% for r in row %}
-            {{ dump(r) }} <br>
+        {% for exercise in row %}
+            <b>{{ exercise.exercise }}</b>-gmean {{ exercise.galmean }}<br>
+            {% for user in exercise.user %}
+               <u> {{ user.uname }}</u> : tries: {{ user.nbTries }}, mean: {{ user.mean }}<br>
+                Marks : {% for mark in user.mark %}
+                    {{ mark }} -
+                {% endfor %}<br>
+            {% endfor %}<br>
         {% endfor %}
-{#
-        {% for res in exores %}
-            {{ res.id }} -{{ res.mark }} -{{ res.response }} -{{ res.paper.id }} - {{ res.interaction.question.title }} <br>
-        {% endfor %}
-#}
+
     </div>
 {% endblock %}
 

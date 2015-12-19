@@ -5,9 +5,7 @@ namespace CPASimUSante\ExoverrideBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
-use Pagerfanta\Adapter\ArrayAdapter;
-use Pagerfanta\Pagerfanta;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Claroline\CoreBundle\Library\Resource\ResourceCollection;
 
@@ -217,7 +215,7 @@ var_dump($res[0]->getMark());
         }
     }
 
-    private function getMean($tmpmean, $uid, $mark, $mean, $galmean)
+    private function getMean($tmpmean, $uid, $exerciseId, $mark, $mean, $galmean)
     {
         if (!isset($tmpmean[$uid]))
         {
@@ -259,12 +257,12 @@ var_dump($res[0]->getMark());
      * @param array $userlist
      * @return Response
      */
-    public function exportResCompleteAllExerciseCSVAction($exolist=array())
+    public function resultsAndStatsForExercise($exolist=array(), $userlist=array())
     {
         $em = $this->getDoctrine()->getManager();
         $data = array();
 
-        $exolist = array(26, 27, 28);
+        $exolist = array(3, 4, 5);
         //get the Exercises entities
         $exercises = $em->getRepository('UJMExoBundle:Exercise')->findById($exolist);
 
@@ -273,9 +271,8 @@ var_dump($res[0]->getMark());
         //list of labels for Choice
         $choicetmp = array();
 
-        $tmpmean    = array();
-
         foreach($exercises as $exercise) {
+            //title of exercise for Json
             $data['label'][] = $exercise->getTitle();
             $exerciseId = $exercise->getId();
 
@@ -283,28 +280,32 @@ var_dump($res[0]->getMark());
                 //exercicse title
                 $row[$exerciseId]['exercise'] = $exercise->getTitle();
 
-                //has to be all users : to compute the general mean
+                //Query has to be for all users : to compute the general mean
                 $exerciseResult = $this->getDoctrine()
                     ->getManager()
                     ->getRepository('CPASimUSanteExoverrideBundle:Response')
                     ->getExerciseAllResponsesForAllUsersQuery($exerciseId, 'id');
 
+                $tmpmean    = array();
                 //mean for user for the exercise
                 $mean       = array();
                 //general mean for the exercise
-                $galmean    = 0;
-
+                $row[$exerciseId]['galmean'] = 0;
+                $gmean = array('m'=>0, 'c'=>0);
                 foreach ($exerciseResult as $results)
                 {
-                    $row1 = $results->getPaper();
+                    $paper = $results->getPaper();
                     //paper_id
-                    $paper = $row1->getId();
+                    $paperId = $paper->getId();
 
-                    $uid = $row1->getUser()->getId();
-                    $uname = $row1->getUser()->getLastName() . '-' . $row1->getUser()->getFirstName();
+                    $uid = $paper->getUser()->getId();
+                    $uname = $paper->getUser()->getLastName() . '-' . $paper->getUser()->getFirstName();
 
-                    $row[$exerciseId]['user'][$uid]['id'] = $uname;
-                    $row[$exerciseId]['user'][$uid]['mark'][] = $results->getMark();
+                    //mark
+                    $mark = $results->getMark();
+
+                    $row[$exerciseId]['user'][$uid]['uname'] = $uname;
+                    $row[$exerciseId]['user'][$uid]['mark'][] = $mark;
                     $row[$exerciseId]['user'][$uid]['nbTries'] = $results->getNbTries();
 
                     //get the result for responses for an exercise
@@ -329,82 +330,105 @@ var_dump($res[0]->getMark());
                     $arr_tmp = array(
                         //$row2->getResponse(),     //don't want to display choices ids : get labels instead
                         'choice'    => $choice,
-                        'marks'     => $results->getMark(),
+                        'marks'     => $mark,
                         'tries'     => $results->getNbTries(),
                         'title'     => $results->getInteraction()->getQuestion()->getTitle(),
                     );
 
-                    $results2[$paper][] = $arr_tmp;
+                    $results2[$paperId][] = $arr_tmp;
 
-                    $means = $this->getMean($tmpmean, $uid, $results->getMark(), $mean, $galmean);
+
+                    if (!isset($tmpmean[$uid]))
+                    {
+                        $tmpmean[$uid]['sum'] = $mark;
+                        $tmpmean[$uid]['count'] = 1;
+                    }
+                    else
+                    {
+                        $tmpmean[$uid]['sum'] += $mark;
+                        $tmpmean[$uid]['count'] += 1;
+                    }
+
+                    $gmean['m'] += $mark;
+                    $gmean['c'] += 1;
+
+                    foreach ($tmpmean as $uid => $m)
+                    {
+                        //compute mean for each user
+                        if (isset($m['count']))
+                        {
+                            $row[$exerciseId]['user'][$uid]['mean'] = $m['sum']/$m['count'];
+                        }
+                        else
+                        {
+                            $row[$exerciseId]['user'][$uid]['mean'] = 0;
+                        }
+//echo 'Exo'.$exerciseId.', User'.$uid.' : '.'mean : '.$row[$exerciseId]['user'][$uid]['mean'].'<br>';
+                    }
+//                    echo '-out-<br>';
+/*
+                    $means = $this->getMean($tmpmean, $uid, $exerciseId, $results->getMark(), $mean, $galmean);
                     $row[$exerciseId]['galmean'] = $means['galmean'];
                     $row[$exerciseId]['user'][$uid]['mean'] = $means['mean'];
+*/
                 }
+                $row[$exerciseId]['galmean'] = $gmean['m']/$gmean['c'];
             }
         }
-
+        return $row;
+//die();
+/*
         return $this->render(
             'UJMExoBundle:Paper:showStatsForExercises.html.twig', array(
                 'datas'      => $data,
                 'row'    => $row,
             )
         );
-
-
-
-
-
-
-
-        /*
-        //get the Exercise entity
-        $exercises = $em->getRepository('UJMExoBundle:Exercise')->findById($exolist);
-
-        foreach($exercises as $exercise)
-        {
-            $rowCSV = array();
-            $data['label'][] = $exercise->getTitle();
-
-            //get paper for this exercise
-            $row1 = $exercise[0]->getPaper();
-            //paper_id
-            $paper = $row1->getId();
-
-            $uid = $row1->getUser()->getId();
-
-            $data['datasets']['label'][] = $row1->getUser()->getLastName() . ' ' . $row1->getUser()->getFirstName();
-            $data['datasets']['data'][] = '';
-
-        }
 */
+    }
 /*
-        $responseResults = $this->getDoctrine()
-            ->getManager()
-            ->getRepository('CPASimUSanteExoverrideBundle:Response')
-            ->getSomeExerciseAllResponsesForAllUsers($exolist);
+     * @Route(
+     *     "/statsjson",
+     *     name         = "ujm_stats_json",
+     *     options      = { "expose" = true }
+     * )
+     * @Method("GET")
+ */
+    /**
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     *
+     * @param array $exolist
+     * @param array $userlist
+     * @return JsonResponse
+     */
+    public function getResultExercicesJsonAction($exolist=array(), $userlist=array())
+    {
+        $response = '';
 
-        foreach ($responseResults as $response)
-        {
-            $rowCSV = array();
+        return new JsonResponse($response);
+    }
 
-            //get paper for this exercise
-            $row1 = $response->getPaper();
-            //paper_id
-            $paper = $row1->getId();
-            $uid = $row1->getUser()->getId();
-
-            $rowCSV[] = $uid;
-            $rowCSV[] = $row1->getUser()->getLastName() . '-' . $row1->getUser()->getFirstName();
-
-        }
+    public function getResultExercicesHtmlAction($exolist=array(), $userlist=array())
+    {
+        $row = $this->resultsAndStatsForExercise($exolist, $userlist);
         return $this->render(
             'UJMExoBundle:Paper:showStatsForExercises.html.twig', array(
-                'exores'      => $responseResults,
-                'rows'      => $rowCSV,
+                'row'    => $row,
             )
         );
-*/
+    }
+
+    public function getResultExercicesCsvAction($exolist=array(), $userlist=array())
+    {
+        $content = '';
+        $date = new \DateTime();
+        $now = $date->format('Ymd-His');
 
 
+
+        return new Response($content, 200, array(
+            'Content-Type' => 'application/force-download',
+            'Content-Disposition' => 'attachment; filename="exportall-'.$now.'.csv"'
+        ));
     }
 }
