@@ -272,7 +272,7 @@ var_dump($res[0]->getMark());
 
         foreach($exercises as $exercise) {
             //title of exercise for Json
-         //   $row['label'][] = $exercise->getTitle();
+        //   $row['label'][] = $exercise->getTitle();
 
             $exerciseId = $exercise->getId();
 
@@ -281,7 +281,7 @@ var_dump($res[0]->getMark());
                 $row[$exerciseId]['exercise'] = $exercise->getTitle();
 
                 //Query has to be for all users : to compute the general mean
-                $exerciseResult = $this->getDoctrine()
+                $exerciseResponses = $this->getDoctrine()
                     ->getManager()
                     ->getRepository('CPASimUSanteExoverrideBundle:Response')
                     ->getExerciseAllResponsesForAllUsersQuery($exerciseId, 'id');
@@ -292,9 +292,9 @@ var_dump($res[0]->getMark());
                 //general mean for the exercise
                 $row[$exerciseId]['galmean'] = 0;
                 $gmean = array('m'=>0, 'c'=>0);
-                foreach ($exerciseResult as $results)
+                foreach ($exerciseResponses as $responses)
                 {
-                    $paper = $results->getPaper();
+                    $paper = $responses->getPaper();
                     //paper_id
                     $paperId = $paper->getId();
 
@@ -302,17 +302,17 @@ var_dump($res[0]->getMark());
                     $uname = $paper->getUser()->getLastName() . '-' . $paper->getUser()->getFirstName();
 
                     //mark
-                    $mark = $results->getMark();
+                    $mark = $responses->getMark();
 
                     $row[$exerciseId]['user'][$uid]['uname'] = $uname;
                     $row[$exerciseId]['user'][$uid]['mark'][] = $mark;
-                    $row[$exerciseId]['user'][$uid]['nbTries'] = $results->getNbTries();
+                    $row[$exerciseId]['user'][$uid]['nbTries'] = $responses->getNbTries();
 
                     //get the result for responses for an exercise
 
                     //can't get the ujm_choice directly in the first query (string with ;)
                     $choice = array();
-                    $choiceIds = array_filter(explode(";",$results->getResponse()), 'strlen'); //to avoid empty value
+                    $choiceIds = array_filter(explode(";", $responses->getResponse()), 'strlen'); //to avoid empty value
                     foreach ($choiceIds as $cid)
                     {
                         if (!in_array($cid, $choicetmp))//to avoid duplicate queries
@@ -326,17 +326,10 @@ var_dump($res[0]->getMark());
                             $choice[] = $choicetmp[$cid];
                         }
                     }
-                    //Create an array for each response from a user
-                    $arr_tmp = array(
-                        //$row2->getResponse(),     //don't want to display choices ids : get labels instead
-                        'choice'    => $choice,
-                        'marks'     => $mark,
-                        'tries'     => $results->getNbTries(),
-                        'title'     => $results->getInteraction()->getQuestion()->getTitle(),
-                    );
-
-                    $results2[$paperId][] = $arr_tmp;
-
+                    $question = $responses->getInteraction()->getQuestion();
+                    $questionId = $question->getId();
+                    $row[$exerciseId]['question'][$questionId]['name'] = $question->getTitle();
+                    $row[$exerciseId]['user'][$uid]['question'][] = implode(';', $choice);
 
                     if (!isset($tmpmean[$uid]))
                     {
@@ -377,12 +370,18 @@ var_dump($res[0]->getMark());
 //die();
     }
 
-    private function rgb2hex($color){
+    private function rgb2hex($color)
+    {
         $color = str_replace("#", "", $color);
         $r = hexdec(substr($color,0,2));
         $g = hexdec(substr($color,2,2));
         $b = hexdec(substr($color,4,2));
         return array($r, $g, $b);
+    }
+
+    private function rgbacolor($color, $opacity=1)
+    {
+        return 'rgba('.join(',',$color).','.$opacity.')';
     }
 
     /**
@@ -405,8 +404,7 @@ var_dump($res[0]->getMark());
             "#885578", "#FAD09F", "#FF8A9A", "#D157A0", "#BEC459", "#456648", "#0086ED", "#886F4C");
         //to rgb
         $colors = array_map(array($this, 'rgb2hex'), $rgbcolors);
-        //with opacity
-        $colors = array_map(function ($color){return 'rgba('.join(',',$color).',0.3)';}, $colors);
+
         $datas = $this->resultsAndStatsForExercise($exolist, $userlist);
         /**/
         $json = array();
@@ -424,13 +422,14 @@ var_dump($res[0]->getMark());
             }
         }
         $inc = 0;
+        //dataset for group
+        $json['datasets'][] = $this->setObjectForRadarDataset('group', $galmean, $this->rgbacolor($colors[$inc]));
+        $inc++;
         foreach($user as $u)
         {
-            $json['datasets'][] = $this->setObjectForRadarDataset($u['name'], $u['mean'], $colors[$inc]);
+            $json['datasets'][] = $this->setObjectForRadarDataset($u['name'], $u['mean'], $this->rgbacolor($colors[$inc]));
             $inc++;
         }
-        //dataset for group
-        $json['datasets'][] = $this->setObjectForRadarDataset('group', $galmean, $colors[$inc], true);
 
         return new JsonResponse($json);
 
@@ -461,8 +460,7 @@ var_dump($res[0]->getMark());
         $class->data = $data;
         $class->pointStrokeColor = "#fff";
         $class->pointHighlightFill = "#fff";
-        if ($fill)
-            $class->fillColor = $color;
+        $class->fillColor = "rgba(0,0,0,0)";
         $class->strokeColor = $color;
         $class->pointHighlightFill = $color;;
         return $class;
@@ -470,15 +468,96 @@ var_dump($res[0]->getMark());
 
     public function getResultExercisesCsvAction($exolist=array(), $userlist=array())
     {
-        $content = '';
+
         $date = new \DateTime();
         $now = $date->format('Ymd-His');
-
+/*
         $row = $this->resultsAndStatsForExercise($exolist, $userlist);
 
         return new Response($content, 200, array(
             'Content-Type' => 'application/force-download',
             'Content-Disposition' => 'attachment; filename="exportall-'.$now.'.csv"'
         ));
+*/
+        //TODO : repasser les $csv dans un array general et mettre dans exportResCompleteCSVAction
+        //TODO : pour n'avoir qu'une boucle
+        $handle = fopen('php://memory', 'r+');
+        $row = $this->resultsAndStatsForExercise($exolist, $userlist);
+        foreach($row['row'] as $exercice)
+        {
+            $csv = array();
+            //exercise name
+            $csv[] = $exercice['exercise'];
+            //general mean
+            $csv[] = number_format(($exercice['galmean'])*100, 2);
+            $csv[] = 'Essai';
+            //questions name
+            foreach($exercice['question'] as $question)
+            {
+                $csv[] = $question['name'];
+            }
+
+
+          /*  $infosPaper = $this->container->get('ujm.exercise_services')->getInfosPaper($row1);
+            $score = $infosPaper['scorePaper'] / $infosPaper['maxExoScore'];
+            $score = $score * 20;*/
+            //user id
+            fputcsv($handle, $csv);
+            foreach($exercice['user'] as $k => $userdata)
+            {
+                $csv = array();
+                $csv[] = $exercice['user'][$k]['uname'];
+                $csv[] = number_format(($exercice['user'][$k]['mean'])*100, 2);
+                $csv[] = $userdata['nbTries'];
+                fputcsv($handle, $csv);
+                //responses
+                $csv = array();
+                $csv[] = '';
+                $csv[] = '';
+                $csv[] = '';
+                foreach($userdata['question'] as $response)
+                {
+                    $csv[] = $response;
+                }
+                fputcsv($handle, $csv);
+
+            }
+/*
+            $rowCSV[] = $row1->getUser()->getLastName() . ' ' . $row1->getUser()->getFirstName();
+            $rowCSV[] = $row1->getNumPaper();
+            $rowCSV[] = $row1->getStart()->format('Y-m-d H:i:s');
+            if ($row1->getEnd()) {
+                $rowCSV[] = $row1->getEnd()->format('Y-m-d H:i:s');
+            } else {
+                $rowCSV[] = $this->get('translator')->trans('no_finish');
+            }
+            $rowCSV[] = $row1->getInterupt();
+            $rowCSV[] = $this->container->get('ujm.exercise_services')->roundUpDown($score);
+*/
+
+
+            $csv = array();
+            fputcsv($handle, $csv);
+        }
+        //$csv = $row['row'];
+
+        rewind($handle);
+        $content = stream_get_contents($handle);
+        fclose($handle);
+
+
+        return new Response($content, 200, array(
+            'Content-Type' => 'application/force-download',
+            'Content-Disposition' => 'attachment; filename="exportall-'.$now.'.csv"'
+        ));
+
+/*
+        return $this->render(
+            'UJMExoBundle:Paper:testCsv.html.twig', array(
+                //'csv'    => $content,
+                'csv'    => $row['row'],
+            )
+        );
+*/
     }
 }
