@@ -260,7 +260,6 @@ var_dump($res[0]->getMark());
     public function resultsAndStatsForExercise($exolist=array(), $userlist=array())
     {
         $em = $this->getDoctrine()->getManager();
-        $data = array();
 
         $exolist = array(3, 4, 5);
         //get the Exercises entities
@@ -273,7 +272,8 @@ var_dump($res[0]->getMark());
 
         foreach($exercises as $exercise) {
             //title of exercise for Json
-            $data['label'][] = $exercise->getTitle();
+         //   $row['label'][] = $exercise->getTitle();
+
             $exerciseId = $exercise->getId();
 
             if ($this->container->get('ujm.exercise_services')->isExerciseAdmin($exercise)) {
@@ -366,34 +366,25 @@ var_dump($res[0]->getMark());
 //echo 'Exo'.$exerciseId.', User'.$uid.' : '.'mean : '.$row[$exerciseId]['user'][$uid]['mean'].'<br>';
                     }
 //                    echo '-out-<br>';
-/*
-                    $means = $this->getMean($tmpmean, $uid, $exerciseId, $results->getMark(), $mean, $galmean);
-                    $row[$exerciseId]['galmean'] = $means['galmean'];
-                    $row[$exerciseId]['user'][$uid]['mean'] = $means['mean'];
-*/
                 }
                 $row[$exerciseId]['galmean'] = $gmean['m']/$gmean['c'];
             }
         }
-        return $row;
-//die();
-/*
-        return $this->render(
-            'UJMExoBundle:Paper:showStatsForExercises.html.twig', array(
-                'datas'      => $data,
-                'row'    => $row,
-            )
+
+        return array(
+            'row'   => $row,
         );
-*/
+//die();
     }
-/*
-     * @Route(
-     *     "/statsjson",
-     *     name         = "ujm_stats_json",
-     *     options      = { "expose" = true }
-     * )
-     * @Method("GET")
- */
+
+    private function rgb2hex($color){
+        $color = str_replace("#", "", $color);
+        $r = hexdec(substr($color,0,2));
+        $g = hexdec(substr($color,2,2));
+        $b = hexdec(substr($color,4,2));
+        return array($r, $g, $b);
+    }
+
     /**
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      *
@@ -401,30 +392,89 @@ var_dump($res[0]->getMark());
      * @param array $userlist
      * @return JsonResponse
      */
-    public function getResultExercicesJsonAction($exolist=array(), $userlist=array())
+    public function getResultExercisesJsonAction($exolist=array(), $userlist=array())
     {
-        $response = '';
+        //hexa colors list
+        $rgbcolors = array("#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059",
+            "#FFDBE5", "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
+            "#5A0007", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
+            "#61615A", "#BA0900", "#6B7900", "#00C2A0", "#FFAA92", "#FF90C9", "#B903AA", "#D16100",
+            "#DDEFFF", "#000035", "#7B4F4B", "#A1C299", "#300018", "#0AA6D8", "#013349", "#00846F",
+            "#372101", "#FFB500", "#C2FFED", "#A079BF", "#CC0744", "#C0B9B2", "#C2FF99", "#001E09",
+            "#00489C", "#6F0062", "#0CBD66", "#EEC3FF", "#456D75", "#B77B68", "#7A87A1", "#788D66",
+            "#885578", "#FAD09F", "#FF8A9A", "#D157A0", "#BEC459", "#456648", "#0086ED", "#886F4C");
+        //to rgb
+        $colors = array_map(array($this, 'rgb2hex'), $rgbcolors);
+        //with opacity
+        $colors = array_map(function ($color){return 'rgba('.join(',',$color).',0.3)';}, $colors);
+        $datas = $this->resultsAndStatsForExercise($exolist, $userlist);
+        /**/
+        $json = array();
+        $json['datasets'] = array();
+        $user = array();
+        $galmean = array();
+        foreach($datas['row'] as $e => $exercice)
+        {
+            $json['labels'][] = $exercice['exercise'];
+            $galmean[] = number_format(($exercice['galmean'])*100, 2);
+            foreach($exercice['user'] as $k => $userdata)
+            {
+                $user[$k]['name'] = $exercice['user'][$k]['uname'];
+                $user[$k]['mean'][] = number_format(($exercice['user'][$k]['mean'])*100, 2);
+            }
+        }
+        $inc = 0;
+        foreach($user as $u)
+        {
+            $json['datasets'][] = $this->setObjectForRadarDataset($u['name'], $u['mean'], $colors[$inc]);
+            $inc++;
+        }
+        //dataset for group
+        $json['datasets'][] = $this->setObjectForRadarDataset('group', $galmean, $colors[$inc], true);
 
-        return new JsonResponse($response);
+        return new JsonResponse($json);
+
+//        return new JsonResponse($json);
     }
 
-    public function getResultExercicesHtmlAction($exolist=array(), $userlist=array())
+    public function getResultExercisesRadarAction()
     {
-        $row = $this->resultsAndStatsForExercise($exolist, $userlist);
+        return $this->render(
+            'UJMExoBundle:Paper:testJson.html.twig', array()
+        );
+    }
+
+    public function getResultExercisesHtmlAction($exolist=array(), $userlist=array())
+    {
+        $data = $this->resultsAndStatsForExercise($exolist, $userlist);
         return $this->render(
             'UJMExoBundle:Paper:showStatsForExercises.html.twig', array(
-                'row'    => $row,
+                'row'    => $data['row'],
             )
         );
     }
 
-    public function getResultExercicesCsvAction($exolist=array(), $userlist=array())
+    private function setObjectForRadarDataset($label, $data, $color, $fill=false)
+    {
+        $class = new \stdClass();
+        $class->label = $label;
+        $class->data = $data;
+        $class->pointStrokeColor = "#fff";
+        $class->pointHighlightFill = "#fff";
+        if ($fill)
+            $class->fillColor = $color;
+        $class->strokeColor = $color;
+        $class->pointHighlightFill = $color;;
+        return $class;
+    }
+
+    public function getResultExercisesCsvAction($exolist=array(), $userlist=array())
     {
         $content = '';
         $date = new \DateTime();
         $now = $date->format('Ymd-His');
 
-
+        $row = $this->resultsAndStatsForExercise($exolist, $userlist);
 
         return new Response($content, 200, array(
             'Content-Type' => 'application/force-download',

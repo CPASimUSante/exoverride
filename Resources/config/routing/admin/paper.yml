@@ -2,6 +2,20 @@ ujm_paper_export_complete_results:
     pattern:  /export/complete_results/csv/{exerciseId}
     defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:exportResCompleteCSV" }
 
-ujm_paper_export_all_results:
-    pattern:  /export/all_results/html
-    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercicesHtml" }
+ujm_paper_show_all_results:
+    pattern:  /show/all_results/html
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesHtml" }
+
+ujm_paper_export_all_results_cvs:
+    pattern:  /export/all_results/csv
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesCsv" }
+
+ujm_paper_export_all_results_json:
+    pattern:  /export/all_results/json
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesJson" }
+    options:
+        expose: true
+
+ujm_paper_export_test_json:
+    pattern:  /export/all_results/testjson
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesRadar" }

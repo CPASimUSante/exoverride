@@ -16,10 +16,11 @@
 {% block section_content %}
 
     <div class="panel-heading">
-        <h3 class="panel-title">DEV - TMP PAGE - SHOULD BE JSON</h3>
+        <h3 class="panel-title">HTML display of results for exercises</h3>
     </div>
 
     <div class="panel-body">
+
         {% for exercise in row %}
             <b>{{ exercise.exercise }}</b>-gmean {{ exercise.galmean }}<br>
             {% for user in exercise.user %}
