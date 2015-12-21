@@ -1,0 +1,3 @@
+cpasimusante_get_user_in_ws:
+    pattern:  /usersinws
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:ExoverrideWidget:getUsersInWorkspace" }

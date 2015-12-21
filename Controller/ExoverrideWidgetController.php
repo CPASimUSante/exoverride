@@ -104,4 +104,22 @@ class ExoverrideWidgetController extends Controller
             'form' => $form->createView(),
         );
     }
+
+    /**
+     * Called in Widget Config
+     *
+     * @EXT\Route(
+     *     "/usersinws",
+     *     name="cpasimusante_get_user_in_ws",
+     *     options={"expose"=true}
+     * )
+     */
+    public function getUsersInWorkspaceAction()
+    {
+        $ws = array(2);
+        $em = $this->getDoctrine()->getManager();
+        $listofuser = $em->getRepository('ClarolineCoreBundle:User')
+            ->findUsersByWorkspaces($ws);
+        return new JsonResponse($listofuser->getId());
+    }
 }
