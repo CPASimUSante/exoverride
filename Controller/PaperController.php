@@ -261,7 +261,7 @@ var_dump($res[0]->getMark());
     {
         $em = $this->getDoctrine()->getManager();
 
-        $exolist = array(3, 4, 5);
+        $exolist = array(26,27,28);
         //get the Exercises entities
         $exercises = $em->getRepository('UJMExoBundle:Exercise')->findById($exolist);
 
@@ -360,7 +360,14 @@ var_dump($res[0]->getMark());
                     }
 //                    echo '-out-<br>';
                 }
-                $row[$exerciseId]['galmean'] = $gmean['m']/$gmean['c'];
+                if ($gmean['c'] != 0)
+                {
+                    $row[$exerciseId]['galmean'] = $gmean['m']/$gmean['c'];
+                }
+                else
+                {
+                    $row[$exerciseId]['galmean'] = 0;
+                }
             }
         }
 
@@ -559,5 +566,13 @@ var_dump($res[0]->getMark());
             )
         );
 */
+    }
+
+    public function openRadarAction()
+    {
+        return $this->render(
+            'UJMExoBundle:Widget:iframe.html.twig', array(
+            )
+        );
     }
 }

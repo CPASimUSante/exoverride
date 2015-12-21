@@ -1,1 +1,3 @@
-.radaranalytics {width:450px !important;height: 450px !important}
+.radarstat{display: block}
+.exportgraph{display: none}
+.containerradar{width: 100%;position:relative}

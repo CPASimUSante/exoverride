@@ -21,15 +21,15 @@
 
     <div class="panel-body">
 
-        {% for exercise in row %}
-            <b>{{ exercise.exercise }}</b>-gmean {{ exercise.galmean }}<br>
-            {% for user in exercise.user %}
-               <u> {{ user.uname }}</u> : tries: {{ user.nbTries }}, mean: {{ user.mean }}<br>
-                Marks : {% for mark in user.mark %}
-                    {{ mark }} -
-                {% endfor %}<br>
-            {% endfor %}<br>
-        {% endfor %}
+                {% for exercise in row %}
+                    <b>{{ exercise.exercise }}</b>-gmean {{ exercise.galmean }}<br>
+                    {% for user in exercise.user %}
+                       <u> {{ user.uname }}</u> : tries: {{ user.nbTries }}, mean: {{ user.mean }}<br>
+                        Marks : {% for mark in user.mark %}
+                            {{ mark }} -
+                        {% endfor %}<br>
+                    {% endfor %}<br>
+                {% endfor %}
 
     </div>
 {% endblock %}

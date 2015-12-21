@@ -2,16 +2,20 @@ TODO : manage tree categories
 Use Gedmo
 http://stackoverflow.com/questions/25090919/create-tree-nested-select-option
 
-TODO : Export csv
+TODO : Export csv optimization
 http://obtao.com/blog/2013/12/export-data-to-a-csv-file-with-symfony/
 
 TODO : Save canvas as image
 http://weworkweplay.com/play/saving-html5-canvas-as-image/
 http://stackoverflow.com/questions/12796513/html5-canvas-to-png-file
 http://jsfiddle.net/AbdiasSoftware/7PRNN/
+http://www.mikechambers.com/blog/2011/01/31/setting-the-background-color-when-generating-images-from-canvas-todataurl/
+
+=> maybe try 2 canvas : 1 canvas for chart, 1 canvas for legend
 
 TODO : check results if
 - multiple response for a user to en exercice (what the csv looks like, does the radar works, how to manage the stats)
 - a user has not answered a question (csv + radar)
 - a user has not answered an exercise (csv + radar)
 
+TODO : add user / Exercise parameter

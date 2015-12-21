@@ -3,6 +3,7 @@ namespace CPASimUSante\ExoverrideBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Claroline\CoreBundle\Entity\Widget\WidgetInstance;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity
@@ -18,15 +19,24 @@ class ExoverrideStatConfig
     protected $id;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    protected $graphType;
-
-    /**
      * @ORM\ManyToOne(targetEntity="Claroline\CoreBundle\Entity\Widget\WidgetInstance")
      * @ORM\JoinColumn(onDelete="CASCADE")
      */
     protected $widgetInstance;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="userlist", type="string", length=255)
+     */
+    protected $userList;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="resourcelist", type="string", length=255)
+     */
+    protected $resourcelist;
 
     public function getId()
     {
@@ -44,26 +54,50 @@ class ExoverrideStatConfig
     }
 
     /**
-     * Set graphType
+     * Set userList
      *
-     * @param integer $graphType
+     * @param string $userList
      *
      * @return ExoverrideStatConfig
      */
-    public function setGraphType($graphType)
+    public function setUserList($userList)
     {
-        $this->graphType = $graphType;
+        $this->userList = $userList;
 
         return $this;
     }
 
     /**
-     * Get graphType
+     * Get userList
      *
-     * @return integer
+     * @return string
      */
-    public function getGraphType()
+    public function getUserList()
     {
-        return $this->graphType;
+        return $this->userList;
+    }
+
+    /**
+     * Set resourcelist
+     *
+     * @param string $resourcelist
+     *
+     * @return ExoverrideStatConfig
+     */
+    public function setResourcelist($resourcelist)
+    {
+        $this->resourcelist = $resourcelist;
+
+        return $this;
+    }
+
+    /**
+     * Get resourcelist
+     *
+     * @return string
+     */
+    public function getResourcelist()
+    {
+        return $this->resourcelist;
     }
 }

@@ -19,3 +19,9 @@ ujm_paper_export_all_results_json:
 ujm_paper_export_test_json:
     pattern:  /export/all_results/testjson
     defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesRadar" }
+
+ujm_paper_show_radar:
+    pattern:  /show/frame
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:openRadar" }
+    options:
+        expose: true

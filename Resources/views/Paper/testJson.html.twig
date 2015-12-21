@@ -25,12 +25,15 @@
         <div id="csvdata"></div>
         <script src="{{ asset('bundles/cpasimusantechartjs/js/Chart.min.js') | raw }}"></script>
         <link rel="stylesheet" type="text/css" media="screen" href="{{ asset('bundles/cpasimusanteexoverride/css/chartjs.css') }}">
-        <canvas id="radaranalytics" height="350" width="300" crossOrigin="Anonymous"></canvas>
+        <div id="containerradar">
+            <canvas id="radaranalytics" height="350" width="300" crossOrigin="Anonymous"></canvas>
+        </div>
         <form id="send2base46"><input type="hidden" name="img64" id="img64" />
         <input type="submit"></form>
         <style>
             #radaranalytics{background-color:#f0f0f0!important;}
             .radarlegend{background-color:blue!important;}
+            .containerradar{width: 100%;position:relative}
         </style>
 <script>
             var radarChartData = {};

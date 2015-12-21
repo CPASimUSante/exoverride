@@ -1,0 +1,21 @@
+{% set layout = "ClarolineCoreBundle:Workspace:layout.html.twig" %}
+
+{% if isDesktop() %}
+    {% set layout = "ClarolineCoreBundle:Desktop:layout.html.twig" %}
+{% endif %}
+
+{% extends layout %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ asset('bundles/cpasimusanteexoverride/css/chartjs.css') }}">
+{% endblock %}
+
+{% block title %} {{ 'radar' | trans }} {% endblock %}
+
+{% block section_content %}
+    <p><a class="btn btn-primary btn-sm showcsv">Afficher le graphique</a> <a class="btn btn-primary btn-sm exportgraph">Enregistrer l'image</a></p>
+    <div id="containerradar"><canvas id="radaranalytics" class="radarstat" height="350" width="300" ></canvas></div>
+    <script src="{{ asset('bundles/cpasimusantechartjs/js/Chart.min.js') | raw }}"></script>
+    <script src="{{ asset('bundles/cpasimusanteexoverride/js/exoverride.js') | raw }}"></script>
+{% endblock %}

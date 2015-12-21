@@ -1,4 +1,7 @@
 {% block stylesheets %}
     <link rel="stylesheet" type="text/css" media="screen" href="{{ asset('bundles/cpasimusanteexoverride/css/chartjs.css') }}">
 {% endblock %}
-<canvas id="radaranalytics" height="350" width="300"></canvas>
+<p><a class="btn btn-primary btn-sm showcsv">Afficher le graphique</a> <a class="btn btn-primary btn-sm exportgraph">Enregistrer l'image</a></p>
+
+<div id="containerradar"><canvas id="radaranalytics" class="radarstat" height="350" width="300"></canvas></div>
+{#<iframe class="activity-iframe" height="500" src="{{ path('ujm_paper_show_radar', {}) }}"></iframe>#}
