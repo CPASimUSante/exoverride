@@ -261,7 +261,7 @@ var_dump($res[0]->getMark());
     {
         $em = $this->getDoctrine()->getManager();
 
-        $exolist = array(3,4,5);
+        $exolist = array(26,27,28);
         //get the Exercises entities
         $exercises = $em->getRepository('UJMExoBundle:Exercise')->findById($exolist);
 
@@ -574,5 +574,19 @@ var_dump($res[0]->getMark());
             'UJMExoBundle:Widget:iframe.html.twig', array(
             )
         );
+    }
+
+    public function getUsersInWorkspaceAction()
+    {
+        $ws = array(2);
+        $em = $this->getDoctrine()->getManager();
+        $listofuser = $em->getRepository('ClarolineCoreBundle:User')
+            ->findUsersByWorkspaces($ws);
+        $ids = [];
+        foreach($listofuser as $user)
+        {
+            $ids[] = $user->getId();
+        }
+        return new JsonResponse($ids);
     }
 }

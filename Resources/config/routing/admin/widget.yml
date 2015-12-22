@@ -1,3 +1,5 @@
-cpasimusante_get_user_in_ws:
-    pattern:  /usersinws
-    defaults: { _controller: "CPASimUSanteExoverrideBundle:ExoverrideWidget:getUsersInWorkspace" }
+cpasimusante_statwidget_config:
+    pattern:  /configwidget/{widgetInstance}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:ExoverrideWidget:userStatWidgetConfigureForm" }
+    options:
+        expose: true

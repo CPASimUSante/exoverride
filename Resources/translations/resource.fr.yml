@@ -1,4 +1,5 @@
 userlist_for_graph: Utilisateurs
 resourcelist_for_graph: Ressources
-pick_user_for_stat: Choisir des utilisateurs
+pick_user_for_stats: Choisir les utilisateurs
+pick_exo_for_stats: Choisir les exercices
 select_users_to_add_to_graph: Choix des utilisateurs à ajouter

@@ -25,3 +25,9 @@ ujm_paper_show_radar:
     defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:openRadar" }
     options:
         expose: true
+
+cpasimusante_get_user_in_ws:
+    pattern:  /usersinws
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getUsersInWorkspace" }
+    options:
+        expose: true

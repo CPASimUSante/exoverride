@@ -76,13 +76,7 @@ class ExoverrideWidgetController extends Controller
      * @param WidgetInstance $widgetInstance
      * @return array    AJAX response
      *
-     * @EXT\Route(
-     *     "/configwidget/{widgetInstance}",
-     *     name="cpasimusante_statwidget_config",
-     *     options={"expose"=true}
-     * )
      * @EXT\ParamConverter("authenticatedUser", options={"authenticatedUser" = true})
-     * @EXT\Template("CPASimUSanteExoverrideBundle:Widget:statWidgetConfigure.html.twig")
      */
     public function userStatWidgetConfigureFormAction(WidgetInstance $widgetInstance, Request $request)
     {
@@ -90,18 +84,30 @@ class ExoverrideWidgetController extends Controller
             throw new AccessDeniedException();
         }
 
-        $form = $this->formFactory->create(new ExoverrideStatConfigType());
+        $em = $this->get('doctrine.orm.entity_manager');
+
+        $widgetExoverrideRadar = $em->getRepository('CPASimUSanteExoverrideBundle:ExoverrideStatConfig')->findOneByWidgetInstance($widgetInstance);
+
+        if (null === $widgetExoverrideRadar) {
+            $widgetExoverrideRadar = new ExoverrideStatConfig();
+            $widgetExoverrideRadar
+                ->setWidgetInstance($widgetInstance);
+        }
+
+        $form = $this->formFactory->create(new ExoverrideStatConfigType(), $widgetExoverrideRadar);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
-            $em = $this->get('doctrine.orm.entity_manager');
-            $em->persist($widgetInstance);
+            $em->persist($widgetExoverrideRadar);
             $em->flush();
+            return new Response('', Response::HTTP_NO_CONTENT);
         }
-
-        return array(
-            'widgetInstance' => $widgetInstance,
-            'form' => $form->createView(),
+        return $this->render(
+            'CPASimUSanteExoverrideBundle:Widget:statWidgetConfigure.html.twig',
+            array(
+                'form'           => $form->createView(),
+                'widgetInstance' => $widgetInstance
+            )
         );
     }
 

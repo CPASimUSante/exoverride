@@ -6,8 +6,8 @@ use Claroline\CoreBundle\Entity\Widget\WidgetInstance;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * @ORM\Entity
- * @ORM\Table(name="ujm_exo_exoverride_stat_configuration")
+ * @ORM\Entity(repositoryClass="CPASimUSante\ExoverrideBundle\Repository\ExoverrideStatConfigRepository")
+ * @ORM\Table(name="cpasimusante__exoverride_stat_configuration")
  */
 class ExoverrideStatConfig
 {

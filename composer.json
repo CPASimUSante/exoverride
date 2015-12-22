@@ -1,12 +1,14 @@
 {
     "name": "cpasimusante/exoverride-bundle",
+    "description": "Adds statistics and charts for QCU in UJM/ExoBundle",
     "keywords": ["Claroline", "Plugin"],
     "homepage": "http://www.claroline.net",
     "type": "claroline-plugin",
     "license": "GPL-3.0+",
     "require": {
         "php": ">=5.4.1",
-        "claroline/core-bundle": "~6.0"
+        "claroline/core-bundle": "~6.0",
+        "cpasimusante/chart-js-bundle": "dev-master"
     },
     "autoload": {
         "psr-0": { "CPASimUSante\\ExoverrideBundle": "" }

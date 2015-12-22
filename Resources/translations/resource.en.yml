@@ -1,4 +1,5 @@
 userlist_for_graph: Users
 resourcelist_for_graph: Resources
-pick_user_for_stat: Pick users
+pick_user_for_stats: Pick users
+pick_exo_for_stats: Pick exercicse
 select_users_to_add_to_graph: Select user to add to graph

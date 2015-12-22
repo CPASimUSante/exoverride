@@ -15,11 +15,11 @@ class ExoverrideStatConfigType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('userlist', 'text', array(
+            ->add('userlist', 'hidden', array(
                 'required' => true,
                 'label' => 'userlist_for_graph'
             ))
-            ->add('resourcelist', 'text', array(
+            ->add('resourcelist', 'hidden', array(
                 'required' => true,
                 'label' => 'resourcelist_for_graph'
             ))

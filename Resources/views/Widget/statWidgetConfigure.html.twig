@@ -1,8 +1,8 @@
 {% form_theme form 'ClarolineCoreBundle::form_theme_no_label.html.twig' %}
-{# {{ path('cpasimusante_statwidget_config', {'widget': widgetInstance.getId()}) }}#}
+{#  #}
 <form role="form"
       class="form-horizontal"
-      action="#"
+      action="{{ path('cpasimusante_statwidget_config', {'widgetInstance': widgetInstance.getId()}) }}"
       method="post"
       novalidate
         >
@@ -10,19 +10,23 @@
 
         <table class="table">
             <tr id="pick-user-for-stats">
-                <td class="isel_label">{{ form.userlist.vars.label }}</td>
-                <td class="isel_widget">{{ form_widget(form.userlist) }}</td>
-                <td class="isel_widget">
-                    <i class="fa fa-user-plus pointer-hand pull-right"
-                       id="pick-user-for-stats-btn"
+                <td class="isel_label">{{ form.userlist.vars.label|trans({}, 'resource') }}{{ form_widget(form.userlist) }}</td>
+                <td class="isel_widget"></td>
+                <td class="isel_extra">
+                    <a class="btn btn-primary" id="pick-user-for-stats-btn" title="{{ 'pick_user_for_stats'|trans({}, 'resource') }}">
+                        <i class="fa fa-user-plus pointer-hand pull-right"
                        data-placement="left"
-                       title="{{ 'pick_user_for_stat'|trans({}, 'resource') }}"></i>
+                       ></i></a>
                 </td>
             </tr>
-            <tr>
-                <td class="isel_label">{{ form.resourcelist.vars.label }}</td>
-                <td class="isel_widget">{{ form_widget(form.resourcelist) }}</td>
-                <td class="isel_widget">{{ form_errors(form.resourcelist) }}</td>
+            <tr id="pick-exo-for-stats">
+                <td class="isel_label">{{ form.resourcelist.vars.label|trans({}, 'resource') }}{{ form_widget(form.resourcelist) }}</td>
+                <td class="isel_widget"></td>
+                <td class="isel_extra">
+                    <a class="btn btn-primary" id="pick-exo-for-stats-btn" title="{{ 'pick_exo_for_stats'|trans({}, 'resource') }}"><i class="fa fa-folder-open pointer-hand pull-right"
+                           data-placement="left"
+                           ></i></a>
+                </td>
             </tr>
         </table>
 
@@ -37,36 +41,68 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        var allUsersInWS = '';
-
+        var manager = window.Claroline.ResourceManager;
+        var selectedUsers = [];
+        var allUsersInWS = [];
+        //get users of this WS
         $.ajax({
             url: Routing.generate('cpasimusante_get_user_in_ws', {}),
             type: 'GET',
             success: function (datas) {
-                allUsersInWS = (datas !== null) ? datas.join(",") : '';
+                allUsersInWS = (datas !== null) ? datas : [];
             }
         });
-
+        //pick users
         $('#pick-user-for-stats').on('click', '#pick-user-for-stats-btn', function () {
+            var su = $('#cpasimusante_exoverridebundle_exoverridestatconfig_userlist').val();
+            selectedUsers = (su === '') ? [] : su.split(',');
             var userPicker = new UserPicker();
             var settings = {
                 multiple: true,
-                picker_name: 'contacts_picker',
+                picker_name: 'graphuser_picker',
                 picker_title: Translator.trans('select_users_to_add_to_graph', {},'resource'),
-                whitelist: allUsersInWS
+                whitelist: allUsersInWS,
+                return_datas: true,
+                selected_users:selectedUsers
             };
             userPicker.configure(settings, addUsersToGraph);
             userPicker.open();
         });
-        addUsersToGraph = function(userIds) {
-            if (userIds !== null) {
-                $('#cpasimusante_exoverridebundle_exoverridestatconfig_userlist').val(userIds);
+        //callback, add users to widget user field
+        addUsersToGraph = function(users) {
+            var userAdded = '';
+            var userIds = [];
+            if (users !== null) {
+                for (var i= 0,tot=users.length;i<tot;i++) {
+                    userAdded += users[i].lastName+" "+users[i].firstName+"<br>";
+                    userIds.push(users[i].id);
+                }
             }
+            $('#pick-user-for-stats .isel_widget').html(userAdded);
+            $('#cpasimusante_exoverridebundle_exoverridestatconfig_userlist').val(userIds);
         };
-/*
-        var allContactIdsTxt = '' + $('#contacts-datas-box').data('contacts-id');
-        var allContactIds = allContactIdsTxt !== '' ?
-                allContactIdsTxt.split(',') :
-*/
+
+        //pick exercise
+        $('#pick-exo-for-stats').on('click', '#pick-exo-for-stats-btn', function () {
+            var that = $(this);
+            if (!manager.hasPicker('exoRadarPicker')) {
+                manager.createPicker('exoRadarPicker', {
+                    callback: function (nodes) {
+                        var resourceAdded = '';
+                        for (var id in nodes) {
+                            resourceAdded += nodes[id][3]+"<br>";//the resource with path
+                        }
+                        $('#pick-exo-for-stats .isel_widget').html(resourceAdded);
+                        $('#cpasimusante_exoverridebundle_exoverridestatconfig_resourcelist').val(_.keys(nodes));
+                    },
+                    isPickerMultiSelectAllowed: true,
+                    isDirectorySelectionAllowed: false,
+                    typeWhiteList: ['ujm_exercise']
+                    //restrictForOwner: true
+                }, true);
+            } else {
+                manager.picker('exoRadarPicker', 'open');
+            }
+        });
     });
 </script>

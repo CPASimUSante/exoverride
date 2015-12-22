@@ -6,3 +6,7 @@ exoverride_controller:
 admin_paper:
     resource: "routing/admin/paper.yml"
     prefix:   /admin/paper
+
+admin_widget:
+    resource: "routing/admin/widget.yml"
+    prefix:   /admin/widget
