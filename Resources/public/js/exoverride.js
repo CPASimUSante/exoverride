@@ -6,7 +6,10 @@
 
     ///Get the data and Draw the chart
     $('.showcsv').on('click', function(){
-        var params = {};
+        var userlist        = $('#userresource').data('user');
+        var resourcelist    = $('#userresource').data('resource');
+
+        var params = {userlist:userlist, resourcelist:resourcelist};
         $.ajax({
             type:"GET",
             url: Routing.generate('ujm_paper_export_all_results_json'),

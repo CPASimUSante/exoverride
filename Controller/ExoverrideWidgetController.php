@@ -67,7 +67,24 @@ class ExoverrideWidgetController extends Controller
      */
     public function userStatDisplayAction(WidgetInstance $widgetInstance)
     {
-        return array('widgetInstance' => $widgetInstance);
+        $em = $this->get('doctrine.orm.entity_manager');
+        $widgetExoverrideRadar = $em->getRepository('CPASimUSanteExoverrideBundle:ExoverrideStatConfig')->findOneByWidgetInstance($widgetInstance);
+        if ($widgetExoverrideRadar !== null)
+        {
+            $userlist      = $widgetExoverrideRadar->getUserlist();
+            $resourcelist  = $widgetExoverrideRadar->getResourcelist();
+        }
+       else
+       {
+           $userlist      = array();
+           $resourcelist  = array();
+       }
+
+        return array(
+            'widgetInstance' => $widgetInstance,
+            'userlist'       => $userlist,
+            'resourcelist'   => $resourcelist,
+        );
     }
 
     /**

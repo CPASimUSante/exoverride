@@ -261,7 +261,7 @@ var_dump($res[0]->getMark());
     {
         $em = $this->getDoctrine()->getManager();
 
-        $exolist = array(26,27,28);
+        $exolist = array(3,4,5);
         //get the Exercises entities
         $exercises = $em->getRepository('UJMExoBundle:Exercise')->findById($exolist);
 
@@ -439,8 +439,6 @@ var_dump($res[0]->getMark());
         }
 
         return new JsonResponse($json);
-
-//        return new JsonResponse($json);
     }
 
     public function getResultExercisesRadarAction()
