@@ -1,5 +1,5 @@
 plugin:
-    has_options: false
+    has_options: true
     widgets:
       - name: exo_stat
         is_configurable: true

@@ -1,0 +1,159 @@
+{% extends "ClarolineCoreBundle:Administration:layout.html.twig" %}
+
+{% macro isel_prototype(form) %}
+    <table class="table">
+        <tr>
+            <td class="isel_label">{{ form_label(form.mainResourceType) }}</td>
+            <td class="isel_widget">{{ form_widget(form.mainResourceType) }}</td>
+            <td class="isel_widget">{{ form_errors(form.mainResourceType) }}</td>
+        </tr>
+        <tr>
+            <td class="isel_label">{{ form_label(form.workspace) }}</td>
+            <td class="isel_widget">{{ form_widget(form.workspace) }}</td>
+            <td class="isel_widget">{{ form_errors(form.workspace) }}</td>
+        </tr>
+        <tr>
+            <td class="isel_label">{{ form_label(form.resourceType) }}</td>
+            <td class="isel_widget">{{ form_widget(form.resourceType) }}</td>
+            <td class="isel_widget">{{ form_errors(form.resourceType) }}</td>
+        </tr>
+        <tr>
+            <td class="isel_label">{{ form_label(form.namePattern) }}</td>
+            <td class="isel_widget">{{ form_widget(form.namePattern) }}</td>
+            <td class="isel_widget">{{ form_errors(form.namePattern) }}</td>
+        </tr>
+        <tr>
+            <td class="isel_label">{{ form_label(form.itemCount) }}</td>
+            <td class="isel_widget">{{ form_widget(form.itemCount) }}</td>
+            <td class="isel_widget">{{ form_errors(form.itemCount) }}</td>
+        </tr>
+    </table>
+{% endmacro %}
+
+{% block breadcrumb %}
+    {{ macros.breadcrumbs([
+    {
+        'icon': 'icon-cog',
+        'name': 'administration'|trans({}, 'platform'),
+        'href': path('claro_admin_index')
+    },
+    {
+        'name': 'packages'|trans({}, 'platform'),
+        'href': path('claro_admin_open_tool', {'toolName': 'platform_packages'})
+    },
+    {
+        'name': 'exo_stat'|trans({}, 'widget'),
+        'href': ''
+    }
+    ]) }}
+{% endblock %}
+
+{% block section_content %}
+    <div class="panel panel-default">
+        <form action="#" method="post" {{ form_enctype(form) }} role="form" class="form-horizontal" id="form">
+            <div class="panel-heading">
+                <h3 class="panel-title">Configuration</h3>
+            </div>
+
+            <div class="panel-body" id="text_content">
+{#
+                <ul class="isel-item" data-prototype="{{ _self.isel_prototype(form.items.vars.prototype)|e }}">
+                    {% for item in form.items %}
+                        <li class="item">{{ _self.isel_prototype(item) }}</li>
+                    {% endfor %}
+                </ul>
+#}
+            </div>
+
+            <div class="panel-footer">
+                <button type="button" class="btn btn-default" >{{ 'cancel'|trans({}, 'platform') }}</button>
+                <button type="submit" class="btn btn-primary">{{ 'save'|trans({}, 'platform') }}</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ asset('bundles/cpasimusanteexoverride/css/exoverride.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {# Claroline JS #}
+    {{ parent() }}
+    <script type="text/javascript">
+        /*
+        $(document).ready(function() {
+            var $collectionHolder = $('ul.isel-item');
+            var $addItemLink = $('<a href="#" class="add_item_link btn btn-info"><span class="fa fa-plus"></span> Ajouter un item</a>');
+            var $newLink = $('<li></li>').append($addItemLink);
+
+            // add a delete link to all of the existing Item form li elements
+            $collectionHolder.find('li.item').each(function() {
+                addItemFormDeleteLink(this);
+            });
+
+            // add the "add an item" anchor and li to the tags ul
+            $collectionHolder.append($newLink);
+
+            // count the current form inputs we have (e.g. 2), use that as the new
+            // index when inserting a new item (e.g. 2)
+            $collectionHolder.data('index', $collectionHolder.find(':input').length);
+
+            $addItemLink.on('click', function(e) {
+                // prevent the link from creating a "#" on the URL
+                e.preventDefault();
+
+                // add a new item form
+                addItemForm($collectionHolder, $newLink);
+            });
+
+            function addItemForm($collectionHolder, $newLink) {
+                // Get the data-prototype
+                var prototype = $collectionHolder.data('prototype');
+
+                // get the new index
+                var index = $collectionHolder.data('index');
+
+                // Replace '$$name$$' in the prototype's HTML to
+                // instead be a number based on how many items we have
+                var newForm = prototype.replace(/__name__/g, index);
+
+                // increase the index with one for the next item
+                $collectionHolder.data('index', index + 1);
+
+                // Display the form in the page in an li, before the "Add an Item" link li
+                var $newFormLi = $('<li class="item"></li>').append(newForm);
+
+                // also add a remove button, just for this example
+                //$newFormLi.append('<a href="#" class="remove-item btn btn-danger">x</a>');
+
+                $newLink.before($newFormLi);
+
+                // add a delete link to the new form
+                addItemFormDeleteLink($newFormLi);
+
+                // handle the removal
+                $('.remove-item').click(function(e) {
+                    e.preventDefault();
+                    $(this).parent().remove();
+                    return false;
+                });
+            }
+
+            function addItemFormDeleteLink($itemFormLi) {
+                var $removeFormA = $('<td><a href="#" class="remove-item btn btn-danger"><span class="fa fa-trash"></span> Delete this config</a></td>');
+                $($itemFormLi).find("table").append($removeFormA);
+
+                $($removeFormA).find("a").on('click', function(e) {
+                    // prevent the link from creating a "#" on the URL
+                    e.preventDefault();
+                    // remove the li for the tag form
+                    $itemFormLi.remove();
+                });
+            }
+        });
+        */
+    </script>
+
+{% endblock %}

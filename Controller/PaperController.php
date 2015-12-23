@@ -251,17 +251,17 @@ var_dump($res[0]->getMark());
 
     /**
      * List of exercices results
-     * Data to be formated as JSON
+     * Data to be used in various ways : jsonj, csv, html
      *
      * @param array $exolist
-     * @param array $userlist
+     * @param array $userlist   not used yet here
      * @return Response
      */
     public function resultsAndStatsForExercise($exolist=array(), $userlist=array())
     {
         $em = $this->getDoctrine()->getManager();
 
-        $exolist = array(3,4,5);
+        $exolist = array(26,27,28);
         //get the Exercises entities
         $exercises = $em->getRepository('UJMExoBundle:Exercise')->findById($exolist);
 
@@ -392,15 +392,21 @@ var_dump($res[0]->getMark());
     }
 
     /**
+     * Data to be sent to Chart.js
+     *
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      *
-     * @param array $exolist
-     * @param array $userlist
+     * @param string $resourcedata
+     * @param string $userdata
      * @return JsonResponse
      */
-    public function getResultExercisesJsonAction($exolist=array(), $userlist=array())
+    public function getResultExercisesJsonAction($resourcedata='', $userdata='')
     {
-        //hexa colors list
+        $exolist = ($resourcedata == '') ? array() : explode(',', $resourcedata);
+        $userlist = ($userdata == '') ? array() : explode(',', $userdata);
+//$exolist = array(26,27);
+
+        //list of hexa colors for graph
         $rgbcolors = array("#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059",
             "#FFDBE5", "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
             "#5A0007", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
@@ -413,29 +419,37 @@ var_dump($res[0]->getMark());
         $colors = array_map(array($this, 'rgb2hex'), $rgbcolors);
 
         $datas = $this->resultsAndStatsForExercise($exolist, $userlist);
-        /**/
+
         $json = array();
         $json['datasets'] = array();
         $user = array();
         $galmean = array();
         foreach($datas['row'] as $e => $exercice)
         {
-            $json['labels'][] = $exercice['exercise'];
-            $galmean[] = number_format(($exercice['galmean'])*100, 2);
-            foreach($exercice['user'] as $k => $userdata)
-            {
-                $user[$k]['name'] = $exercice['user'][$k]['uname'];
-                $user[$k]['mean'][] = number_format(($exercice['user'][$k]['mean'])*100, 2);
-            }
+//            if (in_array($e, $exolist))
+//            {
+                $json['labels'][] = $exercice['exercise'];
+                $galmean[] = number_format(($exercice['galmean'])*100, 2);
+                foreach($exercice['user'] as $k => $userdata)
+                {
+                    $user[$k]['name'] = $exercice['user'][$k]['uname'];
+                    $user[$k]['mean'][] = number_format(($exercice['user'][$k]['mean'])*100, 2);
+                }
+//            }
         }
         $inc = 0;
         //dataset for group
         $json['datasets'][] = $this->setObjectForRadarDataset('group', $galmean, $this->rgbacolor($colors[$inc]));
         $inc++;
-        foreach($user as $u)
+        //datasets for users
+        foreach($user as $k => $u)
         {
-            $json['datasets'][] = $this->setObjectForRadarDataset($u['name'], $u['mean'], $this->rgbacolor($colors[$inc]));
-            $inc++;
+            //display only selected users
+            if (in_array($k, $userlist))
+            {
+                $json['datasets'][] = $this->setObjectForRadarDataset($u['name'], $u['mean'], $this->rgbacolor($colors[$inc]));
+                $inc++;
+            }
         }
 
         return new JsonResponse($json);
@@ -574,9 +588,8 @@ var_dump($res[0]->getMark());
         );
     }
 
-    public function getUsersInWorkspaceAction()
+    public function getUsersInWorkspaceAction($ws = array())
     {
-        $ws = array(2);
         $em = $this->getDoctrine()->getManager();
         $listofuser = $em->getRepository('ClarolineCoreBundle:User')
             ->findUsersByWorkspaces($ws);

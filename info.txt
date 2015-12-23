@@ -18,4 +18,30 @@ TODO : check results if
 - a user has not answered a question (csv + radar)
 - a user has not answered an exercise (csv + radar)
 
+- +++ Check for only QCU.
+
 TODO : add user / Exercise parameter
+- if no fine tuning for exercise through resourcePicker, use entity formtype with custom query.
+
+TODO : radar
+- Add username in tooltip result
+http://stackoverflow.com/questions/28568773/javascript-chart-js-custom-data-formatting-to-display-on-tooltip
+http://jsfiddle.net/rdtome/6cgo4opg/
+
+- Use this chart
+https://github.com/FVANCOP/ChartNew.js
+
+
+TODO : Check access
+Ex: CoreBundle/Controller/WorkspaceController:openAction
+Notation for Entity ? @SEC\PreAuthorize("canAccessWorkspace('OPEN')")
+
+@see : ForumBundle\Controller\ForumController.php
+... "authorization" = @DI\Inject("security.authorization_checker"),
+... $this->authorization->isGranted('EDIT', $tool);
+
+resource creator : creator_id => ResourceNode:creator
+
+
+
+

@@ -4,12 +4,11 @@ namespace CPASimUSante\ExoverrideBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Claroline\CoreBundle\Entity\Widget\WidgetInstance;
 use Claroline\CoreBundle\Entity\Resource\ResourceNode;
-use Claroline\CoreBundle\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="ujm_exo_exoverride_stat_configuration_data")
+ * @ORM\Table(name="cpasimusante__exoverride_stat_configuration_data")
  */
 class ExoverrideStatConfigData
 {
@@ -27,14 +26,6 @@ class ExoverrideStatConfigData
      * @ORM\JoinColumn(name="resource_node_id", referencedColumnName="id")
      */
     protected $resourceNode;
-
-    /**
-     * @var string
-     *
-     * @ORM\ManyToOne(targetEntity="Claroline\CoreBundle\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
-     */
-    protected $users;
 
     /**
      * Set resourceNode
@@ -58,30 +49,6 @@ class ExoverrideStatConfigData
     public function getResourceNode()
     {
         return $this->resourceNode;
-    }
-
-    /**
-     * Set users
-     *
-     * @param User $users
-     *
-     * @return ExoverrideStatConfig
-     */
-    public function setUsers(User $users = null)
-    {
-        $this->users = $users;
-
-        return $this;
-    }
-
-    /**
-     * Get users
-     *
-     * @return User
-     */
-    public function getUsers()
-    {
-        return $this->users;
     }
 
     /**

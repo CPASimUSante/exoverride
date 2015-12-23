@@ -3,6 +3,11 @@ exoverride_controller:
     type: annotation
     prefix: /
 
+exoverride_mainconfig:
+    resource: "@CPASimUSanteExoverrideBundle/Controller/MainConfigController.php"
+    type: annotation
+    prefix: /
+
 admin_paper:
     resource: "routing/admin/paper.yml"
     prefix:   /admin/paper

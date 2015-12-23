@@ -11,7 +11,7 @@ ujm_paper_export_all_results_cvs:
     defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesCsv" }
 
 ujm_paper_export_all_results_json:
-    pattern:  /export/all_results/json
+    pattern:  /export/all_results/json/ul/{userdata}/rl/{resourcedata}
     defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesJson" }
     options:
         expose: true
@@ -27,7 +27,7 @@ ujm_paper_show_radar:
         expose: true
 
 cpasimusante_get_user_in_ws:
-    pattern:  /usersinws
+    pattern:  /usersinws/{ws}
     defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getUsersInWorkspace" }
     options:
         expose: true

@@ -68,11 +68,13 @@ class ExoverrideWidgetController extends Controller
     public function userStatDisplayAction(WidgetInstance $widgetInstance)
     {
         $em = $this->get('doctrine.orm.entity_manager');
-        $widgetExoverrideRadar = $em->getRepository('CPASimUSanteExoverrideBundle:ExoverrideStatConfig')->findOneByWidgetInstance($widgetInstance);
+        $widgetExoverrideRadar = $em->getRepository('CPASimUSanteExoverrideBundle:ExoverrideStatConfig')
+            ->findOneByWidgetInstance($widgetInstance);
+        //parameters needed to display graph
         if ($widgetExoverrideRadar !== null)
         {
             $userlist      = $widgetExoverrideRadar->getUserlist();
-            $resourcelist  = $widgetExoverrideRadar->getResourcelist();
+            $resourcelist  = $widgetExoverrideRadar->getExolist();
         }
        else
        {
@@ -102,8 +104,11 @@ class ExoverrideWidgetController extends Controller
         }
 
         $em = $this->get('doctrine.orm.entity_manager');
+        $userlist = '';
+        $resourcelist = '';
 
-        $widgetExoverrideRadar = $em->getRepository('CPASimUSanteExoverrideBundle:ExoverrideStatConfig')->findOneByWidgetInstance($widgetInstance);
+        $widgetExoverrideRadar = $em->getRepository('CPASimUSanteExoverrideBundle:ExoverrideStatConfig')
+            ->findOneByWidgetInstance($widgetInstance);
 
         if (null === $widgetExoverrideRadar) {
             $widgetExoverrideRadar = new ExoverrideStatConfig();
@@ -111,10 +116,24 @@ class ExoverrideWidgetController extends Controller
                 ->setWidgetInstance($widgetInstance);
         }
 
+        $userlist = $widgetExoverrideRadar->getUserList();
+        $resourcelist = $widgetExoverrideRadar->getResourcelist();
+
         $form = $this->formFactory->create(new ExoverrideStatConfigType(), $widgetExoverrideRadar);
         $form->handleRequest($request);
 
         if ($form->isValid()) {
+            $widgetExoverrideRadar = $form->getData();
+            //Need to add exercise list corresponding to resource list to avoid having a request each time
+            $services = $this->container->get('cpasimusante.exoverride_services');
+            $exercices = $services->getExoList($widgetExoverrideRadar->getResourcelist());
+            $list = array();
+            foreach ($exercices as $exos)
+            {
+                $list[] = $exos->getId();
+            }
+            $exolist = implode(',', $list);
+            $widgetExoverrideRadar->setExolist($exolist);
             $em->persist($widgetExoverrideRadar);
             $em->flush();
             return new Response('', Response::HTTP_NO_CONTENT);
@@ -123,7 +142,9 @@ class ExoverrideWidgetController extends Controller
             'CPASimUSanteExoverrideBundle:Widget:statWidgetConfigure.html.twig',
             array(
                 'form'           => $form->createView(),
-                'widgetInstance' => $widgetInstance
+                'widgetInstance' => $widgetInstance,
+                'userlist'       => $userlist,
+                'resourcelist'   => $resourcelist
             )
         );
     }

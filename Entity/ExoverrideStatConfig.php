@@ -38,6 +38,13 @@ class ExoverrideStatConfig
      */
     protected $resourcelist;
 
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="exolist", type="string", length=255)
+     */
+    protected $exolist;
+
     public function getId()
     {
         return $this->id;
@@ -99,5 +106,29 @@ class ExoverrideStatConfig
     public function getResourcelist()
     {
         return $this->resourcelist;
+    }
+
+    /**
+     * Set exolist
+     *
+     * @param string $exolist
+     *
+     * @return ExoverrideStatConfig
+     */
+    public function setExolist($exolist)
+    {
+        $this->exolist = $exolist;
+
+        return $this;
+    }
+
+    /**
+     * Get exolist
+     *
+     * @return string
+     */
+    public function getExolist()
+    {
+        return $this->exolist;
     }
 }

@@ -1,27 +1,31 @@
 (function () {
     'use strict';
+
     var radarChartData = {};
     var ctx;
     var canvas;
 
     ///Get the data and Draw the chart
     $('.showcsv').on('click', function(){
-        var userlist        = $('#userresource').data('user');
-        var resourcelist    = $('#userresource').data('resource');
+        //parameters to be sent to Chart
+        var userdata        = $('#userresource').data('user');
+        var resourcedata    = $('#userresource').data('resource');
 
-        var params = {userlist:userlist, resourcelist:resourcelist};
-        $.ajax({
-            type:"GET",
-            url: Routing.generate('ujm_paper_export_all_results_json'),
-            data:params,
-            success: function(response) {
-                radarChartData = response;
-                setRadarChart(radarChartData);
-                $('.exportgraph').show();
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-            }
-        });
+        if (userdata != '' && resourcedata != '')
+        {
+            $.ajax({
+                type:"GET",
+                url: Routing.generate('ujm_paper_export_all_results_json', {userdata:userdata, resourcedata:resourcedata}),
+                success: function(response) {
+                    radarChartData = response;
+                    console.log(response);
+                    setRadarChart(radarChartData);
+                    //$('.exportgraph').show();
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                }
+            });
+        }
     });
 
     function setRadarChart(radarChartData) {
@@ -83,7 +87,6 @@
         htmlCanvas.height = window.innerHeight;
         setRadarChart(radarChartData);
     }
-
 
     $('.exportgraph').on('click', function(){
         downloadCanvas(this, 'radaranalytics', 'xxx.png');

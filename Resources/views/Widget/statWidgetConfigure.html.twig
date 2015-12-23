@@ -1,5 +1,5 @@
 {% form_theme form 'ClarolineCoreBundle::form_theme_no_label.html.twig' %}
-{#  #}
+
 <form role="form"
       class="form-horizontal"
       action="{{ path('cpasimusante_statwidget_config', {'widgetInstance': widgetInstance.getId()}) }}"
@@ -42,11 +42,13 @@
 <script type="text/javascript">
     $(document).ready(function() {
         var manager = window.Claroline.ResourceManager;
-        var selectedUsers = [];
+        var su = $('#cpasimusante_exoverridebundle_exoverridestatconfig_userlist').val();
+        var selectedUsers = (su === '') ? [] : su.split(',');
+        var selectedResources = [{{ resourcelist }}];
         var allUsersInWS = [];
         //get users of this WS
         $.ajax({
-            url: Routing.generate('cpasimusante_get_user_in_ws', {}),
+            url: Routing.generate('cpasimusante_get_user_in_ws', {ws:[2]}),
             type: 'GET',
             success: function (datas) {
                 allUsersInWS = (datas !== null) ? datas : [];
@@ -54,8 +56,6 @@
         });
         //pick users
         $('#pick-user-for-stats').on('click', '#pick-user-for-stats-btn', function () {
-            var su = $('#cpasimusante_exoverridebundle_exoverridestatconfig_userlist').val();
-            selectedUsers = (su === '') ? [] : su.split(',');
             var userPicker = new UserPicker();
             var settings = {
                 multiple: true,

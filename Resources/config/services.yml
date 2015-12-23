@@ -1,0 +1,16 @@
+services:
+    cpasimusante.exoverride_services:
+        class: CPASimUSante\ExoverrideBundle\Services\ExoverrideServices
+        arguments: [@claroline.persistence.object_manager]
+
+    cpasimusante_exoverride.controller.mainconfig:
+        class: CPASimUSante\ExoverrideBundle\Controller\MainConfigController
+        calls:
+            - [ setContainer, [ @service_container ]]
+
+    cpasimusante_exoverride.listener.exoverride_listener:
+        class: CPASimUSante\ExoverrideBundle\Listener\ExoverrideListener
+        calls:
+            - [setContainer, ["@service_container"]]
+        tags:
+            - { name: kernel.event_listener, event: plugin_options_exoverridebundle,      method: onAdministrate }
