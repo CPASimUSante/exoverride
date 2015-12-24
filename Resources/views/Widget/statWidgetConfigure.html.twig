@@ -1,108 +1,51 @@
-{% form_theme form 'ClarolineCoreBundle::form_theme_no_label.html.twig' %}
+{%  if userCanAccessWs is not empty %}
+    {% form_theme form 'ClarolineCoreBundle::form_theme_no_label.html.twig' %}
+    <form role="form"
+          class="form-horizontal"
+          action="{{ path('cpasimusante_statwidget_config', {'widgetInstance': widgetInstance.getId()}) }}"
+          method="post"
+          novalidate
+            >
+        <div class="panel-body">
 
-<form role="form"
-      class="form-horizontal"
-      action="{{ path('cpasimusante_statwidget_config', {'widgetInstance': widgetInstance.getId()}) }}"
-      method="post"
-      novalidate
-        >
-    <div class="panel-body">
-
-        <table class="table">
-            <tr id="pick-user-for-stats">
-                <td class="isel_label">{{ form.userlist.vars.label|trans({}, 'resource') }}{{ form_widget(form.userlist) }}</td>
-                <td class="isel_widget"></td>
-                <td class="isel_extra">
-                    <a class="btn btn-primary" id="pick-user-for-stats-btn" title="{{ 'pick_user_for_stats'|trans({}, 'resource') }}">
-                        <i class="fa fa-user-plus pointer-hand pull-right"
-                       data-placement="left"
-                       ></i></a>
-                </td>
-            </tr>
-            <tr id="pick-exo-for-stats">
-                <td class="isel_label">{{ form.resourcelist.vars.label|trans({}, 'resource') }}{{ form_widget(form.resourcelist) }}</td>
-                <td class="isel_widget"></td>
-                <td class="isel_extra">
-                    <a class="btn btn-primary" id="pick-exo-for-stats-btn" title="{{ 'pick_exo_for_stats'|trans({}, 'resource') }}"><i class="fa fa-folder-open pointer-hand pull-right"
+            <table class="table">
+                <tr id="pick-user-for-stats">
+                    <td class="isel_label">{{ form.userlist.vars.label|trans({}, 'resource') }}{{ form_widget(form.userlist) }}</td>
+                    <td class="isel_widget"></td>
+                    <td class="isel_extra">
+                        <a class="btn btn-primary" id="pick-user-for-stats-btn" title="{{ 'pick_user_for_stats'|trans({}, 'resource') }}">
+                            <i class="fa fa-user-plus pointer-hand pull-right"
                            data-placement="left"
                            ></i></a>
-                </td>
-            </tr>
-        </table>
+                    </td>
+                </tr>
+                <tr id="pick-exo-for-stats">
+                    <td class="isel_label">{{ form.resourcelist.vars.label|trans({}, 'resource') }}{{ form_widget(form.resourcelist) }}</td>
+                    <td class="isel_widget"></td>
+                    <td class="isel_extra">
+                        <a class="btn btn-primary" id="pick-exo-for-stats-btn" title="{{ 'pick_exo_for_stats'|trans({}, 'resource') }}"><i class="fa fa-folder-open pointer-hand pull-right"
+                               data-placement="left"
+                               ></i></a>
+                    </td>
+                </tr>
+            </table>
 
-    </div>
-    <div class="panel-footer">
-        <button type="submit" class="btn btn-primary">{{ 'ok'|trans({}, 'platform') }}</button>
-        <a href="#">
-            <button type="button" class="btn btn-default claro-widget-form-cancel">{{ 'cancel'|trans({}, 'platform') }}</button>
-        </a>
-    </div>
-</form>
+        </div>
+        <div class="panel-footer">
+            <button type="submit" class="btn btn-primary">{{ 'ok'|trans({}, 'platform') }}</button>
+            <a href="#">
+                <button type="button" class="btn btn-default claro-widget-form-cancel">{{ 'cancel'|trans({}, 'platform') }}</button>
+            </a>
+        </div>
+    </form>
 
-<script type="text/javascript">
-    $(document).ready(function() {
+    <script type="text/javascript">
         var manager = window.Claroline.ResourceManager;
         var su = $('#cpasimusante_exoverridebundle_exoverridestatconfig_userlist').val();
         var selectedUsers = (su === '') ? [] : su.split(',');
         var selectedResources = [{{ resourcelist }}];
-        var allUsersInWS = [];
-        //get users of this WS
-        $.ajax({
-            url: Routing.generate('cpasimusante_get_user_in_ws', {ws:[2]}),
-            type: 'GET',
-            success: function (datas) {
-                allUsersInWS = (datas !== null) ? datas : [];
-            }
-        });
-        //pick users
-        $('#pick-user-for-stats').on('click', '#pick-user-for-stats-btn', function () {
-            var userPicker = new UserPicker();
-            var settings = {
-                multiple: true,
-                picker_name: 'graphuser_picker',
-                picker_title: Translator.trans('select_users_to_add_to_graph', {},'resource'),
-                whitelist: allUsersInWS,
-                return_datas: true,
-                selected_users:selectedUsers
-            };
-            userPicker.configure(settings, addUsersToGraph);
-            userPicker.open();
-        });
-        //callback, add users to widget user field
-        addUsersToGraph = function(users) {
-            var userAdded = '';
-            var userIds = [];
-            if (users !== null) {
-                for (var i= 0,tot=users.length;i<tot;i++) {
-                    userAdded += users[i].lastName+" "+users[i].firstName+"<br>";
-                    userIds.push(users[i].id);
-                }
-            }
-            $('#pick-user-for-stats .isel_widget').html(userAdded);
-            $('#cpasimusante_exoverridebundle_exoverridestatconfig_userlist').val(userIds);
-        };
-
-        //pick exercise
-        $('#pick-exo-for-stats').on('click', '#pick-exo-for-stats-btn', function () {
-            var that = $(this);
-            if (!manager.hasPicker('exoRadarPicker')) {
-                manager.createPicker('exoRadarPicker', {
-                    callback: function (nodes) {
-                        var resourceAdded = '';
-                        for (var id in nodes) {
-                            resourceAdded += nodes[id][3]+"<br>";//the resource with path
-                        }
-                        $('#pick-exo-for-stats .isel_widget').html(resourceAdded);
-                        $('#cpasimusante_exoverridebundle_exoverridestatconfig_resourcelist').val(_.keys(nodes));
-                    },
-                    isPickerMultiSelectAllowed: true,
-                    isDirectorySelectionAllowed: false,
-                    typeWhiteList: ['ujm_exercise']
-                    //restrictForOwner: true
-                }, true);
-            } else {
-                manager.picker('exoRadarPicker', 'open');
-            }
-        });
-    });
-</script>
+    </script>
+    <script src='{{ asset('bundles/cpasimusanteexoverride/js/exoverride_configure.js') }}' type="text/javascript"></script>
+{% else %}
+    <div id="radarmessage">You can't configure this Widget</div>
+{% endif %}

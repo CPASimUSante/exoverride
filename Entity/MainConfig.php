@@ -4,6 +4,7 @@ namespace CPASimUSante\ExoverrideBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use CPASimUSante\ExoverrideBundle\Entity\MainConfigItem;
 
 /**
  * MainConfig
@@ -50,11 +51,11 @@ class MainConfig
     /**
      * Add item
      *
-     * @param \CPASimUSante\ExoverrideBundle\Entity\MainConfigItem $item
+     * @param MainConfigItem $item
      *
      * @return Mainconfig
      */
-    public function addItem(\CPASimUSante\ExoverrideBundle\Entity\MainConfigItem $item)
+    public function addItem(MainConfigItem $item)
     {
         /*       $this->items[] = $item;
                //$item->setItemselector($this);
@@ -68,9 +69,9 @@ class MainConfig
     /**
      * Remove item
      *
-     * @param \CPASimUSante\ExoverrideBundle\Entity\MainConfigItem $item
+     * @param MainConfigItem $item
      */
-    public function removeItem(\CPASimUSante\ExoverrideBundle\Entity\MainConfigItem $item)
+    public function removeItem(MainConfigItem $item)
     {
         $this->items->removeElement($item);
     }

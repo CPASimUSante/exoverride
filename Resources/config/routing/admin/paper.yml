@@ -27,7 +27,7 @@ ujm_paper_show_radar:
         expose: true
 
 cpasimusante_get_user_in_ws:
-    pattern:  /usersinws/{ws}
+    pattern:  /usersinws/{wslist}
     defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getUsersInWorkspace" }
     options:
         expose: true

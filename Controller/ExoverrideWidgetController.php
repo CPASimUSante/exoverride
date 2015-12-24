@@ -9,8 +9,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Claroline\CoreBundle\Entity\Widget\WidgetInstance;
 use JMS\DiExtraBundle\Annotation as DI;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
-use Claroline\CoreBundle\Persistence\ObjectManager;
 
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,32 +20,31 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ExoverrideWidgetController extends Controller
 {
-    private $om;
+    private $tokenStorage;
     private $formFactory;
     private $userManager;
     private $request;
 
     /**
      * @DI\InjectParams({
-     *     "om"                    = @DI\Inject("claroline.persistence.object_manager"),
+     *     "tokenStorage"          = @DI\Inject("security.token_storage"),
      *     "formFactory"           = @DI\Inject("form.factory"),
      *     "userManager"           = @DI\Inject("claroline.manager.user_manager"),
      *     "requestStack"          = @DI\Inject("request_stack"),
      * })
-     * @param ObjectManager $om
      * @param FormFactory $formFactory
      * @param UserManager $userManager
      * @param RequestStack $requestStack
      */
     public function __construct(
-        ObjectManager $om,
+        TokenStorageInterface $tokenStorage,
         FormFactory $formFactory,
         UserManager $userManager,
         RequestStack $requestStack
     )
     {
         //Object manager initialization
-        $this->om                = $om;
+        $this->tokenStorage      = $tokenStorage;
         $this->formFactory       = $formFactory;
         $this->userManager       = $userManager;
         $this->request           = $requestStack->getCurrentRequest();
@@ -76,17 +75,42 @@ class ExoverrideWidgetController extends Controller
             $userlist      = $widgetExoverrideRadar->getUserlist();
             $resourcelist  = $widgetExoverrideRadar->getExolist();
         }
-       else
-       {
-           $userlist      = array();
-           $resourcelist  = array();
-       }
+        else
+        {
+            $userlist      = '';
+            $resourcelist  = '';
+        }
+        $userCanAccessWs = $this->userCanAccessWs();
 
         return array(
-            'widgetInstance' => $widgetInstance,
-            'userlist'       => $userlist,
-            'resourcelist'   => $resourcelist,
+            'widgetInstance'    => $widgetInstance,
+            'userlist'          => $userlist,
+            'resourcelist'      => $resourcelist,
+            'userCanAccessWs'   => $userCanAccessWs,
         );
+    }
+
+    public function userCanAccessWs()
+    {
+        $em = $this->get('doctrine.orm.entity_manager');
+        //get ws the user has access to
+        $user = $this->tokenStorage->getToken()->getUser();
+        $manager = $this->get('claroline.manager.workspace_manager');
+        $workspaces = $manager->getWorkspacesByUser($user);
+        $wsids = array();
+        foreach($workspaces as $ws)
+        {
+            $wsids[] = $ws->getId();
+        }
+        //get ws the bundle is linked to (from the bundle MainConfig)
+        $awsids = array();
+        $authorizedWs = $em->getRepository('CPASimUSanteExoverrideBundle:MainConfig')->findAll();
+        $authorizedWsItems = $authorizedWs[0]->getItems();
+        foreach($authorizedWsItems as $authorizedWsItem)
+        {
+            $awsids[] = $authorizedWsItem->getWorkspace()->getId();
+        }
+        return array_intersect($wsids, $awsids);
     }
 
     /**
@@ -102,10 +126,17 @@ class ExoverrideWidgetController extends Controller
         if (!$this->get('security.authorization_checker')->isGranted('edit', $widgetInstance)) {
             throw new AccessDeniedException();
         }
-
+        $userCanAccessWs = $this->userCanAccessWs();
+        if ($userCanAccessWs  == array())
+        {
+            return $this->render(
+                'CPASimUSanteExoverrideBundle:Widget:statWidgetConfigure.html.twig',
+                array(
+                    'userCanAccessWs'   => $userCanAccessWs
+                )
+            );
+        }
         $em = $this->get('doctrine.orm.entity_manager');
-        $userlist = '';
-        $resourcelist = '';
 
         $widgetExoverrideRadar = $em->getRepository('CPASimUSanteExoverrideBundle:ExoverrideStatConfig')
             ->findOneByWidgetInstance($widgetInstance);
@@ -124,7 +155,8 @@ class ExoverrideWidgetController extends Controller
 
         if ($form->isValid()) {
             $widgetExoverrideRadar = $form->getData();
-            //Need to add exercise list corresponding to resource list to avoid having a request each time
+            //Need the exercise list corresponding to resource list to persist
+            //in order to avoid having a request each time
             $services = $this->container->get('cpasimusante.exoverride_services');
             $exercices = $services->getExoList($widgetExoverrideRadar->getResourcelist());
             $list = array();
@@ -141,29 +173,12 @@ class ExoverrideWidgetController extends Controller
         return $this->render(
             'CPASimUSanteExoverrideBundle:Widget:statWidgetConfigure.html.twig',
             array(
-                'form'           => $form->createView(),
-                'widgetInstance' => $widgetInstance,
-                'userlist'       => $userlist,
-                'resourcelist'   => $resourcelist
+                'form'              => $form->createView(),
+                'widgetInstance'    => $widgetInstance,
+                'userlist'          => $userlist,
+                'resourcelist'      => $resourcelist,
+                'userCanAccessWs'   => $userCanAccessWs
             )
         );
-    }
-
-    /**
-     * Called in Widget Config
-     *
-     * @EXT\Route(
-     *     "/usersinws",
-     *     name="cpasimusante_get_user_in_ws",
-     *     options={"expose"=true}
-     * )
-     */
-    public function getUsersInWorkspaceAction()
-    {
-        $ws = array(2);
-        $em = $this->getDoctrine()->getManager();
-        $listofuser = $em->getRepository('ClarolineCoreBundle:User')
-            ->findUsersByWorkspaces($ws);
-        return new JsonResponse($listofuser->getId());
     }
 }

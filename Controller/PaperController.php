@@ -261,7 +261,6 @@ var_dump($res[0]->getMark());
     {
         $em = $this->getDoctrine()->getManager();
 
-        $exolist = array(26,27,28);
         //get the Exercises entities
         $exercises = $em->getRepository('UJMExoBundle:Exercise')->findById($exolist);
 
@@ -404,7 +403,6 @@ var_dump($res[0]->getMark());
     {
         $exolist = ($resourcedata == '') ? array() : explode(',', $resourcedata);
         $userlist = ($userdata == '') ? array() : explode(',', $userdata);
-//$exolist = array(26,27);
 
         //list of hexa colors for graph
         $rgbcolors = array("#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059",
@@ -588,15 +586,19 @@ var_dump($res[0]->getMark());
         );
     }
 
-    public function getUsersInWorkspaceAction($ws = array())
+    public function getUsersInWorkspaceAction($wslist = '')
     {
-        $em = $this->getDoctrine()->getManager();
-        $listofuser = $em->getRepository('ClarolineCoreBundle:User')
-            ->findUsersByWorkspaces($ws);
         $ids = [];
-        foreach($listofuser as $user)
+        if ($wslist !== '')
         {
-            $ids[] = $user->getId();
+            $ws = explode(',', $wslist);
+            $em = $this->getDoctrine()->getManager();
+            $listofuser = $em->getRepository('ClarolineCoreBundle:User')
+                ->findUsersByWorkspaces($ws);
+            foreach($listofuser as $user)
+            {
+                $ids[] = $user->getId();
+            }
         }
         return new JsonResponse($ids);
     }

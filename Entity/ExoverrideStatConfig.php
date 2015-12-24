@@ -27,21 +27,21 @@ class ExoverrideStatConfig
     /**
      * @var string
      *
-     * @ORM\Column(name="userlist", type="string", length=255)
+     * @ORM\Column(name="userlist", type="string", length=255, nullable=true)
      */
     protected $userList;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="resourcelist", type="string", length=255)
+     * @ORM\Column(name="resourcelist", type="string", length=255, nullable=true)
      */
     protected $resourcelist;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="exolist", type="string", length=255)
+     * @ORM\Column(name="exolist", type="string", length=255, nullable=true)
      */
     protected $exolist;
 

@@ -4,29 +4,46 @@
     var radarChartData = {};
     var ctx;
     var canvas;
+    var userdata;
+    var resourcedata;
 
-    ///Get the data and Draw the chart
-    $('.showcsv').on('click', function(){
+    function checkRadarAccess()
+    {
         //parameters to be sent to Chart
-        var userdata        = $('#userresource').data('user');
-        var resourcedata    = $('#userresource').data('resource');
+        userdata        = $('#userresource').data('user');
+        resourcedata    = $('#userresource').data('resource');
 
         if (userdata != '' && resourcedata != '')
         {
+            return true;
+        }
+        return false;
+    }
+
+    if (checkRadarAccess())
+    {
+        $('#radarcontent').show();
+        ///Get the data and Draw the chart
+        $('.showcsv').on('click', function(){
             $.ajax({
                 type:"GET",
                 url: Routing.generate('ujm_paper_export_all_results_json', {userdata:userdata, resourcedata:resourcedata}),
                 success: function(response) {
                     radarChartData = response;
-                    console.log(response);
+//console.log(response);
                     setRadarChart(radarChartData);
-                    //$('.exportgraph').show();
+                       //$('.exportgraph').show();
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                 }
             });
-        }
-    });
+        });
+    }
+    else
+    {
+        $('#radarcontent').hide();
+        $('#radarmessage').html('Choose users and exercise in the widget parameters <span class="fa fa-pencil"></span> to display the graphics');
+    }
 
     function setRadarChart(radarChartData) {
         // legend for Chart
@@ -78,7 +95,7 @@
                 scaleShowLabels : true
             });
         };
-        console.log(url);
+console.log(url);
         img.src = url;
     }
 

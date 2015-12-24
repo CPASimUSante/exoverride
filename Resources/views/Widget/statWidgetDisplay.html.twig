@@ -1,2 +1,7 @@
-{% include "CPASimUSanteExoverrideBundle:Chartjs:show.html.twig" %}
-{% include "CPASimUSanteExoverrideBundle:Chartjs:chartjs.js.twig" %}
+{%  if userCanAccessWs is not empty %}
+    {% include "CPASimUSanteExoverrideBundle:Chartjs:show.html.twig" %}
+    {% include "CPASimUSanteExoverrideBundle:Chartjs:chartjs.js.twig" %}
+{% else %}
+    <div id="radarmessage">You can't use this Widget</div>
+{% endif %}
+

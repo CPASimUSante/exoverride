@@ -20,6 +20,10 @@ TODO : check results if
 
 - +++ Check for only QCU.
 
+- in widget, check if on desktop or in WS
+
+
+
 TODO : add user / Exercise parameter
 - if no fine tuning for exercise through resourcePicker, use entity formtype with custom query.
 

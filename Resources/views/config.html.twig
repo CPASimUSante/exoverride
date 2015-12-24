@@ -3,29 +3,9 @@
 {% macro isel_prototype(form) %}
     <table class="table">
         <tr>
-            <td class="isel_label">{{ form_label(form.mainResourceType) }}</td>
-            <td class="isel_widget">{{ form_widget(form.mainResourceType) }}</td>
-            <td class="isel_widget">{{ form_errors(form.mainResourceType) }}</td>
-        </tr>
-        <tr>
             <td class="isel_label">{{ form_label(form.workspace) }}</td>
             <td class="isel_widget">{{ form_widget(form.workspace) }}</td>
             <td class="isel_widget">{{ form_errors(form.workspace) }}</td>
-        </tr>
-        <tr>
-            <td class="isel_label">{{ form_label(form.resourceType) }}</td>
-            <td class="isel_widget">{{ form_widget(form.resourceType) }}</td>
-            <td class="isel_widget">{{ form_errors(form.resourceType) }}</td>
-        </tr>
-        <tr>
-            <td class="isel_label">{{ form_label(form.namePattern) }}</td>
-            <td class="isel_widget">{{ form_widget(form.namePattern) }}</td>
-            <td class="isel_widget">{{ form_errors(form.namePattern) }}</td>
-        </tr>
-        <tr>
-            <td class="isel_label">{{ form_label(form.itemCount) }}</td>
-            <td class="isel_widget">{{ form_widget(form.itemCount) }}</td>
-            <td class="isel_widget">{{ form_errors(form.itemCount) }}</td>
         </tr>
     </table>
 {% endmacro %}
@@ -56,13 +36,13 @@
             </div>
 
             <div class="panel-body" id="text_content">
-{#
+
                 <ul class="isel-item" data-prototype="{{ _self.isel_prototype(form.items.vars.prototype)|e }}">
                     {% for item in form.items %}
                         <li class="item">{{ _self.isel_prototype(item) }}</li>
                     {% endfor %}
                 </ul>
-#}
+
             </div>
 
             <div class="panel-footer">
@@ -82,7 +62,7 @@
     {# Claroline JS #}
     {{ parent() }}
     <script type="text/javascript">
-        /*
+
         $(document).ready(function() {
             var $collectionHolder = $('ul.isel-item');
             var $addItemLink = $('<a href="#" class="add_item_link btn btn-info"><span class="fa fa-plus"></span> Ajouter un item</a>');
@@ -153,7 +133,7 @@
                 });
             }
         });
-        */
+
     </script>
 
 {% endblock %}

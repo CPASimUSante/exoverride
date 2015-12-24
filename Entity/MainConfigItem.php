@@ -3,6 +3,8 @@
 namespace CPASimUSante\ExoverrideBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use CPASimUSante\ExoverrideBundle\Entity\MainConfig;
+use Claroline\CoreBundle\Entity\Workspace\Workspace;
 
 /**
  * MainConfigItem
@@ -23,7 +25,7 @@ class MainConfigItem
 
     /**
      * Workspace to apply
-     * @var \Claroline\CoreBundle\Entity\Workspace\Workspace
+     * @var Workspace
      *
      * @ORM\ManyToOne(targetEntity="Claroline\CoreBundle\Entity\Workspace\Workspace", cascade={"persist"})
      * @ORM\JoinColumn(onDelete="SET NULL", nullable=true)
@@ -51,11 +53,11 @@ class MainConfigItem
     /**
      * Set workspace
      *
-     * @param \Claroline\CoreBundle\Entity\Workspace\Workspace $workspace
+     * @param Workspace $workspace
      *
      * @return MainConfigItem
      */
-    public function setWorkspace(\Claroline\CoreBundle\Entity\Workspace\Workspace $workspace = null)
+    public function setWorkspace(Workspace $workspace = null)
     {
         $this->workspace = $workspace;
 
@@ -65,7 +67,7 @@ class MainConfigItem
     /**
      * Get workspace
      *
-     * @return \Claroline\CoreBundle\Entity\Workspace\Workspace
+     * @return Workspace
      */
     public function getWorkspace()
     {
@@ -75,11 +77,11 @@ class MainConfigItem
     /**
      * Set mainconfig
      *
-     * @param \CPASimUSante\ExoverrideBundle\Entity\MainConfig $mainconfig
+     * @param MainConfig $mainconfig
      *
      * @return MainConfigItem
      */
-    public function setMainconfig(\CPASimUSante\ItemSelectorBundle\Entity\MainConfig $mainconfig = null)
+    public function setMainconfig(MainConfig $mainconfig = null)
     {
         $this->mainconfig = $mainconfig;
 
@@ -89,7 +91,7 @@ class MainConfigItem
     /**
      * Get mainconfig
      *
-     * @return \CPASimUSante\ExoverrideBundle\Entity\MainConfig
+     * @return MainConfig
      */
     public function getMainconfig()
     {
