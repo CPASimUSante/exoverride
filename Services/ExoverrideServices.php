@@ -4,10 +4,16 @@ namespace CPASimUSante\ExoverrideBundle\Services;
 
 use Claroline\CoreBundle\Library\Resource\ResourceCollection;
 use Claroline\CoreBundle\Persistence\ObjectManager;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Claroline\CoreBundle\Manager\WorkspaceManager;
+use Claroline\CoreBundle\Manager\RoleManager;
 
 class ExoverrideServices
 {
-    protected $om;
+    private $om;
+    private $tokenStorage;
+    private $wsManager;
+    private $roleManager;
 
     /**
      * Constructor
@@ -18,10 +24,16 @@ class ExoverrideServices
      *
      */
     public function __construct(
-        ObjectManager $om
+        ObjectManager $om,
+        TokenStorageInterface $tokenStorage,
+        WorkspaceManager $wsManager,
+        RoleManager $roleManager
     )
     {
-        $this->om = $om;
+        $this->om               = $om;
+        $this->tokenStorage     = $tokenStorage;
+        $this->wsManager        = $wsManager;
+        $this->roleManager      = $roleManager;
     }
 
     /**
@@ -105,5 +117,52 @@ class ExoverrideServices
         $query->setParameter('wid', $wid);
         $query->setParameter('cids', $cids);
         return $query->getResult();
+    }
+
+    /**
+     * return list of ws where the user can access this bundle
+     *
+     * @return array
+     */
+    public function userCanAccessWs()
+    {
+        //get ws the user has access to
+        $user = $this->tokenStorage->getToken()->getUser();
+        $workspaces = $this->wsManager->getWorkspacesByUser($user);
+        $wsids = array();
+        foreach($workspaces as $ws)
+        {
+            $wsids[] = $ws->getId();
+        }
+        //get ws the bundle is linked to (from the bundle MainConfig)
+        $awsids = array();
+        $authorizedWs = $this->om
+            ->getRepository('CPASimUSanteExoverrideBundle:MainConfig')->findAll();
+        if (isset($authorizedWs[0]))
+        {
+            $authorizedWsItems = $authorizedWs[0]->getItems();
+            foreach($authorizedWsItems as $authorizedWsItem)
+            {
+                $awsids[] = $authorizedWsItem->getWorkspace()->getId();
+            }
+        }
+        return array_intersect($wsids, $awsids);
+    }
+
+    /**
+     * list of user role by ws
+     * @return array
+     */
+    public function userHasRole()
+    {
+        $user = $this->tokenStorage->getToken()->getUser();
+        $roles = $this->roleManager->getWorkspaceRolesByUser($user);
+        $rolelist = array();
+        foreach($roles as $role)
+        {
+            $rolelist[$role->getWorkspace()->getId()][] = $role->getTranslationKey();
+        }
+
+        return $rolelist;
     }
 }

@@ -1,7 +1,6 @@
-{%  if userCanAccessWs is not empty %}
+{%  if (userCanAccessWs is not empty) %}
     {% include "CPASimUSanteExoverrideBundle:Chartjs:show.html.twig" %}
-    {% include "CPASimUSanteExoverrideBundle:Chartjs:chartjs.js.twig" %}
 {% else %}
-    <div id="radarmessage">You can't use this Widget</div>
+    <div id="radarmessage"><span class="fa fa-exclamation-triangle"></span> You can't use this Widget</div>
 {% endif %}
 

@@ -22,13 +22,19 @@
     <div class="panel-body">
 
                 {% for exercise in row %}
-                    <b>{{ exercise.exercise }}</b>-gmean {{ exercise.galmean }}<br>
+                    <table class="table table-responsive">
+                        <tr><td colspan="2"><b>{{ exercise.exercise }}</b></td><td>Moyenne Générale : {{ exercise.galmean }}</td></tr>
+                        <tr><td colspan="3"><ul>{% for question in exercise.question %}<li>{{ question.name }}</li>{% endfor %}</ul></td></tr>
                     {% for user in exercise.user %}
-                       <u> {{ user.uname }}</u> : tries: {{ user.nbTries }}, mean: {{ user.mean }}<br>
-                        Marks : {% for mark in user.mark %}
-                            {{ mark }} -
-                        {% endfor %}<br>
-                    {% endfor %}<br>
+                        <tr><td><u> {{ user.uname }}</u></td><td>Essai: {{ user.nbTries }}</td><td>Moyenne : {{ user.mean }}</td></tr>
+                        <tr>
+                            <td colspan="3">Marks : {% for inc, mark in user.mark %}
+                            {{ mark }} ({{ user.question[inc] }}) -
+                        {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </table>
                 {% endfor %}
 
     </div>

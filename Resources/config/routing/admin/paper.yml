@@ -1,33 +1,36 @@
-ujm_paper_export_complete_results:
-    pattern:  /export/complete_results/csv/{exerciseId}
-    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:exportResCompleteCSV" }
+cpasimusante_get_user_in_ws:
+    pattern:  /usersinws/{wslist}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getUsersInWorkspace" }
+    options:
+        expose: true
 
-ujm_paper_show_all_results:
-    pattern:  /show/all_results/html
-    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesHtml" }
-
-ujm_paper_export_all_results_cvs:
-    pattern:  /export/all_results/csv
-    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesCsv" }
-
+#controller for gathering data for displaying the radar graph
 ujm_paper_export_all_results_json:
     pattern:  /export/all_results/json/ul/{userdata}/rl/{resourcedata}
     defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesJson" }
     options:
         expose: true
 
-ujm_paper_export_test_json:
-    pattern:  /export/all_results/testjson
-    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesRadar" }
+#show results statistics as html
+ujm_paper_show_all_results:
+    pattern:  /show/all_results/html/{resourcedata}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesHtml" }
+    options:
+        expose: true
+
+#export results statistics as csv
+ujm_paper_export_all_results_cvs:
+    pattern:  /export/all_results/csv/{resourcedata}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesCsv" }
+    options:
+        expose: true
+
+ujm_paper_export_complete_results:
+    pattern:  /export/complete_results/csv/{exerciseId}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:exportResCompleteCSV" }
 
 ujm_paper_show_radar:
     pattern:  /show/frame
     defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:openRadar" }
-    options:
-        expose: true
-
-cpasimusante_get_user_in_ws:
-    pattern:  /usersinws/{wslist}
-    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getUsersInWorkspace" }
     options:
         expose: true

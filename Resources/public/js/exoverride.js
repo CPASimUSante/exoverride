@@ -22,6 +22,18 @@
 
     if (checkRadarAccess())
     {
+        $('#exo-statistics-results').on('click', function(){
+            $.ajax({
+                type:"GET",
+                url: Routing.generate('ujm_paper_show_all_results', {resourcedata: resourcedata}),
+                success: function(response) {
+                    $('#containerradardata').html(response);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                }
+            });
+        });
+
         $('#radarcontent').show();
         ///Get the data and Draw the chart
         $('.showcsv').on('click', function(){
@@ -30,7 +42,6 @@
                 url: Routing.generate('ujm_paper_export_all_results_json', {userdata:userdata, resourcedata:resourcedata}),
                 success: function(response) {
                     radarChartData = response;
-//console.log(response);
                     setRadarChart(radarChartData);
                        //$('.exportgraph').show();
                 },

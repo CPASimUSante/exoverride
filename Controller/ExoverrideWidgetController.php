@@ -10,7 +10,6 @@ use Claroline\CoreBundle\Entity\Widget\WidgetInstance;
 use JMS\DiExtraBundle\Annotation as DI;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration as EXT;
 
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,14 +19,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 class ExoverrideWidgetController extends Controller
 {
-    private $tokenStorage;
     private $formFactory;
     private $userManager;
     private $request;
 
     /**
      * @DI\InjectParams({
-     *     "tokenStorage"          = @DI\Inject("security.token_storage"),
      *     "formFactory"           = @DI\Inject("form.factory"),
      *     "userManager"           = @DI\Inject("claroline.manager.user_manager"),
      *     "requestStack"          = @DI\Inject("request_stack"),
@@ -37,14 +34,12 @@ class ExoverrideWidgetController extends Controller
      * @param RequestStack $requestStack
      */
     public function __construct(
-        TokenStorageInterface $tokenStorage,
         FormFactory $formFactory,
         UserManager $userManager,
         RequestStack $requestStack
     )
     {
         //Object manager initialization
-        $this->tokenStorage      = $tokenStorage;
         $this->formFactory       = $formFactory;
         $this->userManager       = $userManager;
         $this->request           = $requestStack->getCurrentRequest();
@@ -69,6 +64,7 @@ class ExoverrideWidgetController extends Controller
         $em = $this->get('doctrine.orm.entity_manager');
         $widgetExoverrideRadar = $em->getRepository('CPASimUSanteExoverrideBundle:ExoverrideStatConfig')
             ->findOneByWidgetInstance($widgetInstance);
+
         //parameters needed to display graph
         if ($widgetExoverrideRadar !== null)
         {
@@ -80,37 +76,20 @@ class ExoverrideWidgetController extends Controller
             $userlist      = '';
             $resourcelist  = '';
         }
-        $userCanAccessWs = $this->userCanAccessWs();
+        $exoverrideService = $this->container->get('cpasimusante.exoverride_services');
+        //list of user roles
+        $roleList = $exoverrideService->userHasRole();
+
+        //list of ws the user can use this widget
+        $userCanAccessWs = $exoverrideService->userCanAccessWs();
 
         return array(
             'widgetInstance'    => $widgetInstance,
             'userlist'          => $userlist,
             'resourcelist'      => $resourcelist,
             'userCanAccessWs'   => $userCanAccessWs,
+            'roleList'          => $roleList,
         );
-    }
-
-    public function userCanAccessWs()
-    {
-        $em = $this->get('doctrine.orm.entity_manager');
-        //get ws the user has access to
-        $user = $this->tokenStorage->getToken()->getUser();
-        $manager = $this->get('claroline.manager.workspace_manager');
-        $workspaces = $manager->getWorkspacesByUser($user);
-        $wsids = array();
-        foreach($workspaces as $ws)
-        {
-            $wsids[] = $ws->getId();
-        }
-        //get ws the bundle is linked to (from the bundle MainConfig)
-        $awsids = array();
-        $authorizedWs = $em->getRepository('CPASimUSanteExoverrideBundle:MainConfig')->findAll();
-        $authorizedWsItems = $authorizedWs[0]->getItems();
-        foreach($authorizedWsItems as $authorizedWsItem)
-        {
-            $awsids[] = $authorizedWsItem->getWorkspace()->getId();
-        }
-        return array_intersect($wsids, $awsids);
     }
 
     /**
@@ -126,7 +105,10 @@ class ExoverrideWidgetController extends Controller
         if (!$this->get('security.authorization_checker')->isGranted('edit', $widgetInstance)) {
             throw new AccessDeniedException();
         }
-        $userCanAccessWs = $this->userCanAccessWs();
+
+        $exoverrideService = $this->container->get('cpasimusante.exoverride_services');
+        $userCanAccessWs = $exoverrideService->userCanAccessWs();
+        //block the access to configure for users with no right
         if ($userCanAccessWs  == array())
         {
             return $this->render(
@@ -136,49 +118,53 @@ class ExoverrideWidgetController extends Controller
                 )
             );
         }
-        $em = $this->get('doctrine.orm.entity_manager');
+        else
+        {
+            $em = $this->get('doctrine.orm.entity_manager');
 
-        $widgetExoverrideRadar = $em->getRepository('CPASimUSanteExoverrideBundle:ExoverrideStatConfig')
-            ->findOneByWidgetInstance($widgetInstance);
+            $widgetExoverrideRadar = $em->getRepository('CPASimUSanteExoverrideBundle:ExoverrideStatConfig')
+                ->findOneByWidgetInstance($widgetInstance);
 
-        if (null === $widgetExoverrideRadar) {
-            $widgetExoverrideRadar = new ExoverrideStatConfig();
-            $widgetExoverrideRadar
-                ->setWidgetInstance($widgetInstance);
-        }
-
-        $userlist = $widgetExoverrideRadar->getUserList();
-        $resourcelist = $widgetExoverrideRadar->getResourcelist();
-
-        $form = $this->formFactory->create(new ExoverrideStatConfigType(), $widgetExoverrideRadar);
-        $form->handleRequest($request);
-
-        if ($form->isValid()) {
-            $widgetExoverrideRadar = $form->getData();
-            //Need the exercise list corresponding to resource list to persist
-            //in order to avoid having a request each time
-            $services = $this->container->get('cpasimusante.exoverride_services');
-            $exercices = $services->getExoList($widgetExoverrideRadar->getResourcelist());
-            $list = array();
-            foreach ($exercices as $exos)
-            {
-                $list[] = $exos->getId();
+            if (null === $widgetExoverrideRadar) {
+                $widgetExoverrideRadar = new ExoverrideStatConfig();
+                $widgetExoverrideRadar
+                    ->setWidgetInstance($widgetInstance);
             }
-            $exolist = implode(',', $list);
-            $widgetExoverrideRadar->setExolist($exolist);
-            $em->persist($widgetExoverrideRadar);
-            $em->flush();
-            return new Response('', Response::HTTP_NO_CONTENT);
+
+            $userlist = $widgetExoverrideRadar->getUserList();
+            $resourcelist = $widgetExoverrideRadar->getResourcelist();
+
+            $form = $this->formFactory->create(new ExoverrideStatConfigType(), $widgetExoverrideRadar);
+            $form->handleRequest($request);
+
+            if ($form->isValid()) {
+                $widgetExoverrideRadar = $form->getData();
+                //Need the exercise list corresponding to resource list to persist
+                //in order to avoid having a request each time
+                $services = $this->container->get('cpasimusante.exoverride_services');
+                $exercices = $services->getExoList($widgetExoverrideRadar->getResourcelist());
+                $list = array();
+                foreach ($exercices as $exos)
+                {
+                    $list[] = $exos->getId();
+                }
+                $exolist = implode(',', $list);
+                $widgetExoverrideRadar->setExolist($exolist);
+                $em->persist($widgetExoverrideRadar);
+                $em->flush();
+                return new Response('', Response::HTTP_NO_CONTENT);
+            }
+
+            return $this->render(
+                'CPASimUSanteExoverrideBundle:Widget:statWidgetConfigure.html.twig',
+                array(
+                    'form'              => $form->createView(),
+                    'widgetInstance'    => $widgetInstance,
+                    'userlist'          => $userlist,
+                    'resourcelist'      => $resourcelist,
+                    'userCanAccessWs'   => $userCanAccessWs
+                )
+            );
         }
-        return $this->render(
-            'CPASimUSanteExoverrideBundle:Widget:statWidgetConfigure.html.twig',
-            array(
-                'form'              => $form->createView(),
-                'widgetInstance'    => $widgetInstance,
-                'userlist'          => $userlist,
-                'resourcelist'      => $resourcelist,
-                'userCanAccessWs'   => $userCanAccessWs
-            )
-        );
     }
 }

@@ -1,7 +1,7 @@
 services:
     cpasimusante.exoverride_services:
         class: CPASimUSante\ExoverrideBundle\Services\ExoverrideServices
-        arguments: [@claroline.persistence.object_manager]
+        arguments: [@claroline.persistence.object_manager, @security.token_storage, @claroline.manager.workspace_manager, @claroline.manager.role_manager]
 
     cpasimusante_exoverride.controller.mainconfig:
         class: CPASimUSante\ExoverrideBundle\Controller\MainConfigController

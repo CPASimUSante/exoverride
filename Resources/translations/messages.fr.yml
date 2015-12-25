@@ -1,1 +1,3 @@
 export_csv_all_results: 'Export CSV des résultats et réponses'
+show_result_stats_html: 'Afficher la liste des résultats'
+export_results_stats_csv: 'Exporter en CSV'

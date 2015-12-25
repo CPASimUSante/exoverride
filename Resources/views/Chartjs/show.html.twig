@@ -1,10 +1,31 @@
-{% block stylesheets %}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{ asset('bundles/cpasimusanteexoverride/css/chartjs.css') }}">
-{% endblock %}
 <div id="radarmessage"></div>
-<div id="radarcontent">
-    <p><a class="btn btn-primary btn-sm showcsv">Afficher le graphique</a> <a class="btn btn-primary btn-sm exportgraph">Enregistrer l'image</a></p>
+<div id="radarcontent" data-widget-instance="{{ widgetInstance.getId() }}">
+    <p>
+        <a class="btn btn-primary btn-sm showcsv">Afficher le graphique</a>
+        <a class="btn btn-primary btn-sm exportgraph">Enregistrer l'image</a>
+        {% if resourcelist != '' %}
+        <a id="exo-statistics-results"
+           class="btn btn-primary btn-sm">
+            {{ 'show_result_stats_html' | trans({}, 'messages') }}
+        </a>
+        {% endif %}
+        <a href="{{ path('ujm_paper_export_all_results_cvs', {resourcedata: resourcelist}) }}"
+           class="btn btn-primary btn-sm">
+            {{ 'export_results_stats_csv' | trans({}, 'messages') }}
+        </a>
+    </p>
+
     <span id="userresource" data-user="{{ userlist }}" data-resource="{{ resourcelist }}"></span>
+    <div id="containerradardata"></div>
     <div id="containerradar"><canvas id="radaranalytics" class="radarstat" height="350" width="300"></canvas></div>
     {#<iframe class="activity-iframe" height="500" src="{{ path('ujm_paper_show_radar', {}) }}"></iframe>#}
 </div>
+{# has to be after this html ! #}
+{% block javascripts %}
+    <script src="{{ asset('bundles/cpasimusantechartjs/js/Chart.min.js') | raw }}"></script>
+    <script src="{{ asset('bundles/cpasimusanteexoverride/js/exoverride.js') | raw }}"></script>
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ asset('bundles/cpasimusanteexoverride/css/exoverride.css') }}">
+{% endblock %}

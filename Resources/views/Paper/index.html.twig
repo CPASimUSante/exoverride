@@ -42,22 +42,20 @@
                class="btn btn-primary">
                 {{ 'export_csv_results' | trans }}
             </a>
-              <a href="{{ path('ujm_paper_export_complete_results', { 'exerciseId': exoID }) }}"
-                 class="btn btn-primary">
-                  {{ 'export_csv_all_results' | trans({}, 'messages') }}
-              </a>
+{#Exoverride#}
+            <a href="{{ path('ujm_paper_export_complete_results', { 'exerciseId': exoID }) }}"
+               class="btn btn-primary">
+                {{ 'export_csv_all_results' | trans({}, 'messages') }}
+            </a>
             <a href="{{ path('ujm_paper_show_all_results', { }) }}"
                class="btn btn-primary">
                 {{ 'Xhtml' | trans({}, 'messages') }}
-            </a>
-            <a href="{{ path('ujm_paper_export_test_json', { }) }}"
-               class="btn btn-primary">
-                {{ 'Xjson' | trans({}, 'messages') }}
             </a>
             <a href="{{ path('ujm_paper_export_all_results_cvs', { }) }}"
                class="btn btn-primary">
                 {{ 'Xcsv' | trans({}, 'messages') }}
             </a>
+{#Exoverride#}
             {% if _resource.published == FALSE %}
                 <a href="{{ path('ujm_exercise_delete_all_paper', { 'id': exoID }) }}"
                    class="btn btn-primary">

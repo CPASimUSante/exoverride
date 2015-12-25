@@ -14,15 +14,13 @@ http://www.mikechambers.com/blog/2011/01/31/setting-the-background-color-when-ge
 => maybe try 2 canvas : 1 canvas for chart, 1 canvas for legend
 
 TODO : check results if
-- multiple response for a user to en exercice (what the csv looks like, does the radar works, how to manage the stats)
+- multiple response for a user to en exercise (what the csv looks like, does the radar works, how to manage the stats)
 - a user has not answered a question (csv + radar)
 - a user has not answered an exercise (csv + radar)
 
 - +++ Check for only QCU.
 
 - in widget, check if on desktop or in WS
-
-
 
 TODO : add user / Exercise parameter
 - if no fine tuning for exercise through resourcePicker, use entity formtype with custom query.
@@ -46,6 +44,13 @@ Notation for Entity ? @SEC\PreAuthorize("canAccessWorkspace('OPEN')")
 
 resource creator : creator_id => ResourceNode:creator
 
+//check if user is exo creator
+exerciseSer = $this->container->get('ujm.exercise_services');
+$isAdmin = $exerciseSer->isExerciseAdmin($exercise);
 
+token = app.security.getToken()
 
-
+WS repository : findIdsByUserAndRoleNames(User $user, array $roleNames)
+Returns the ids of the workspaces a user is member of, filtered by a set of roles
+the user must have in those workspaces. Role names are actually prefixes of the
+target role (e.g. 'ROLE_WS_COLLABORATOR' instead of 'ROLE_WS_COLLABORATOR_123').
