@@ -6,12 +6,60 @@
     var canvas;
     var userdata;
     var resourcedata;
+    var widgetId;
+    var radarcontent;
 
-    function checkRadarAccess()
+    //for each of the widget
+    $('.radarcontent').each(function(index){
+        widgetId = $(this).data('widget-instance');
+        radarcontent = $(this);
+        if (checkRadarAccess(widgetId))
+        {
+            console.log(widgetId);
+            //show the list of statistic results
+            $('#exo-statistics-results'+widgetId).on('click', function(){
+                $.ajax({
+                    type:"GET",
+                    url: Routing.generate('ujm_paper_show_all_results', {resourcedata: resourcedata}),
+                    success: function(response) {
+                        $('#containerradardata'+widgetId).html(response);
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) { }
+                });
+            });
+
+            $(radarcontent).show();
+            ///Get the data and Draw the chart
+            $('#showcsv'+widgetId).on('click', function(){
+                $.ajax({
+                    type:"GET",
+                    url: Routing.generate('ujm_paper_export_all_results_json', {userdata:userdata, resourcedata:resourcedata}),
+                    success: function(response) {
+                        radarChartData = response;
+                        setRadarChart(radarChartData, widgetId);
+                        //$('.exportgraph').show();
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                    }
+                });
+            });
+        }
+        else
+        {
+            $(radarcontent).hide();
+            $('#radarmessage'+widgetId).html('Choose users and exercise in the widget parameters <span class="fa fa-pencil"></span> to display the graphics');
+        }
+    });
+
+    function checkRadarAccess(widgetId)
     {
         //parameters to be sent to Chart
-        userdata        = $('#userresource').data('user');
-        resourcedata    = $('#userresource').data('resource');
+
+        userdata        = $('#userresource'+widgetId).data('user');
+        resourcedata    = $('#userresource'+widgetId).data('resource');
+console.log('widgetId'+widgetId);
+console.log('userdata'+userdata);
+console.log('resourcedata'+resourcedata);
 
         if (userdata != '' && resourcedata != '')
         {
@@ -20,43 +68,7 @@
         return false;
     }
 
-    if (checkRadarAccess())
-    {
-        $('#exo-statistics-results').on('click', function(){
-            $.ajax({
-                type:"GET",
-                url: Routing.generate('ujm_paper_show_all_results', {resourcedata: resourcedata}),
-                success: function(response) {
-                    $('#containerradardata').html(response);
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                }
-            });
-        });
-
-        $('#radarcontent').show();
-        ///Get the data and Draw the chart
-        $('.showcsv').on('click', function(){
-            $.ajax({
-                type:"GET",
-                url: Routing.generate('ujm_paper_export_all_results_json', {userdata:userdata, resourcedata:resourcedata}),
-                success: function(response) {
-                    radarChartData = response;
-                    setRadarChart(radarChartData);
-                       //$('.exportgraph').show();
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                }
-            });
-        });
-    }
-    else
-    {
-        $('#radarcontent').hide();
-        $('#radarmessage').html('Choose users and exercise in the widget parameters <span class="fa fa-pencil"></span> to display the graphics');
-    }
-
-    function setRadarChart(radarChartData) {
+    function setRadarChart(radarChartData, widgetId) {
         // legend for Chart
         var legend = "<ul style=\"list-style-type:none;\">";
         radarChartData.datasets.forEach(function (dataset) {
@@ -99,14 +111,17 @@
             // create chart
             /* can't use getContext on jQuery object. Must find undelying DOM object */
             //var ctx = $(chartcanvas)[0].getContext('2d');
-            canvas = document.getElementById("radaranalytics");
-            ctx = canvas.getContext('2d');
+            canvas = $('#radaranalytics'+widgetId);
+            ctx = $(canvas)[0].getContext('2d');
+            //canvas = document.getElementById("radaranalytics"+widgetId);
+            //ctx = canvas.getContext('2d');
             var radar = new Chart(ctx).RadarAlt(radarChartData, {
                 responsive: true,
-                scaleShowLabels : true
+                scaleShowLabels : true,
+                multiTooltipTemplate: "<%= value %> - <%= datasetLabel %>"
             });
         };
-console.log(url);
+//console.log(url);
         img.src = url;
     }
 
@@ -116,8 +131,8 @@ console.log(url);
         setRadarChart(radarChartData);
     }
 
-    $('.exportgraph').on('click', function(){
-        downloadCanvas(this, 'radaranalytics', 'xxx.png');
+    $('#exportgraph'+widgetId).on('click', function(){
+        downloadCanvas(this, 'radaranalytics'+widgetId, 'xxx.png');
     });
 
     function downloadCanvas(link, canvasId, filename) {

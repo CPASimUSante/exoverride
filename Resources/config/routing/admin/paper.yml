@@ -34,3 +34,17 @@ ujm_paper_show_radar:
     defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:openRadar" }
     options:
         expose: true
+
+
+ujm_paper_show_all_results_test:
+    pattern:  /show/all_results/htmltest/{resourcedata}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesHtmltest" }
+    options:
+        expose: true
+
+ujm_paper_export_all_results_cvs_test:
+    pattern:  /export/all_results/csvtest/{resourcedata}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesCsvtest" }
+    options:
+        expose: true
+

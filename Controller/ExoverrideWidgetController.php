@@ -80,6 +80,9 @@ class ExoverrideWidgetController extends Controller
         //list of user roles
         $roleList = $exoverrideService->userHasRole();
 
+        //is the user the creator of the exercice ?
+        //$isExerciseAdmin = $this->container->get('ujm.exercise_services')->isExerciseAdmin($exercise);
+
         //list of ws the user can use this widget
         $userCanAccessWs = $exoverrideService->userCanAccessWs();
 

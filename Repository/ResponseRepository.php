@@ -59,7 +59,7 @@ class ResponseRepository extends BaseRepository
             ->setParameters(array(1 => $exoId, 2 => 0));
         return $qb->getQuery();
 
-/*
+/*SELECT * FROM ujm_response AS r JOIN ujm_paper as p ON r.paper_id = p.id JOIN ujm_exercise as e ON e.id = p.exercise_id where e.id=6
         $qb = $this->createQueryBuilder('r');
         $qb->join('r.paper', 'p')
             ->join('p.exercise', 'e')
@@ -69,6 +69,45 @@ class ResponseRepository extends BaseRepository
             ->setParameters(array(1 => $exoId, 2 => 0));
         return $qb->getQuery();
 */
+    }
+
+    public function getAverageForExerciseByUser($exoId)
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('AVG(r.mark) as average_mark')
+            ->addSelect('IDENTITY(p.user) as user')             //IDENTITY needed because user is a FK
+            ->from('UJM\\ExoBundle\\Entity\\Response', 'r')     //thus, avoid problem with "overriding" Response entity in ExoverrideBundle
+            ->join('r.paper', 'p')
+            ->join('p.exercise', 'e')
+            ->where('e.id = ?1')
+            ->andWhere('p.interupt =  ?2')
+            ->groupBy('p.user')
+            ->setParameters(array(1 => $exoId, 2 => 0));
+        return $qb->getQuery()->getResult();
+    }
+
+    public function getAverageForExerciseLastTryByUser($exoId)
+    {
+        $qb = $this->_em->createQueryBuilder();
+        $qb->select('AVG(r.mark) as average_mark')
+            ->addSelect('IDENTITY(p.user) as user')             //IDENTITY needed because user is a FK
+            ->from('UJM\\ExoBundle\\Entity\\Response', 'r')     //thus, avoid problem with "overriding" Response entity in ExoverrideBundle
+            ->join('r.paper', 'p')
+            ->join('p.exercise', 'e')
+            ->where('e.id = ?1')
+            ->andWhere('p.interupt =  ?2')
+            ->andWhere(
+               $qb->expr()->in(
+                   'p.id',
+                   $this->_em->createQueryBuilder()->select('MAX(p2.id)')
+                       ->from('UJM\\ExoBundle\\Entity\\Paper', 'p2')
+                       ->where('p2.exercise= ?1')
+                       ->groupBy('p2.user')
+                       ->getDQL()
+               ))
+            ->groupBy('p.user')
+            ->setParameters(array(1 => $exoId, 2 => 0));
+        return $qb->getQuery()->getResult();
     }
 
     public function getExerciseAllResponsesForAllUsersIterator($exoId, $order)
