@@ -26,11 +26,7 @@ TODO : add user / Exercise parameter
 - if no fine tuning for exercise through resourcePicker, use entity formtype with custom query.
 
 TODO : radar
-- Add username in tooltip result
-http://stackoverflow.com/questions/28568773/javascript-chart-js-custom-data-formatting-to-display-on-tooltip
-http://jsfiddle.net/rdtome/6cgo4opg/
-
-- Use this chart
+- Try this chart
 https://github.com/FVANCOP/ChartNew.js
 
 

@@ -9,9 +9,15 @@
     var widgetId;
     var radarcontent;
 
+//    var grid = $('.grid-stack').data('gridstack');
+
     //for each of the widget
     $('.radarcontent').each(function(index){
         widgetId = $(this).data('widget-instance');
+
+//    grid.resize($('#widget-element-'+widgetId), 8);
+//    grid.resizable($('#widget-element-'+widgetId), false);
+
         radarcontent = $(this);
         if (checkRadarAccess(widgetId))
         {

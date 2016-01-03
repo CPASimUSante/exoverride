@@ -6,8 +6,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-
 use Claroline\CoreBundle\Library\Resource\ResourceCollection;
+
+//TMP fixtures
+use Doctrine\Common\DataFixtures\Loader;
+use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
+use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 
 use UJM\ExoBundle\Controller\PaperController as BaseController;
 
@@ -17,6 +21,18 @@ use UJM\ExoBundle\Controller\PaperController as BaseController;
  */
 class PaperController extends BaseController
 {
+    public function loadFixturesAction()
+    {
+        $em = $this->getDoctrine()->getManager();
+        //Load the fixtures
+        $loader = new Loader();
+        $loader->loadFromDirectory('/home/olivier/www/claroline/claroline6/claro6-samu/Claroline/vendor/cpasimusante/exoverride-bundle/CPASimUSante/ExoverrideBundle/DataFixtures/ORM');
+        //Execute the fixtures
+        $purger = new ORMPurger();
+        $executor = new ORMExecutor($em, $purger);
+        $executor->execute($loader->getFixtures(), true);   //true to append
+    }
+
     /**
      * Data to be sent to Chart.js
      *

@@ -48,3 +48,6 @@ ujm_paper_export_all_results_cvs_test:
     options:
         expose: true
 
+exoverride_fixtures:
+    pattern:  /fixture/load
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:loadFixtures" }
