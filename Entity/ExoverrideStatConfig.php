@@ -4,6 +4,7 @@ namespace CPASimUSante\ExoverrideBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Claroline\CoreBundle\Entity\Widget\WidgetInstance;
 use Doctrine\Common\Collections\ArrayCollection;
+use CPASimUSante\ExoverrideBundle\Entity\ExoverrideStatConfigData;
 
 /**
  * @ORM\Entity(repositoryClass="CPASimUSante\ExoverrideBundle\Repository\ExoverrideStatConfigRepository")
@@ -32,19 +33,25 @@ class ExoverrideStatConfig
     protected $userList;
 
     /**
-     * @var string
+     * @var $datas[]
      *
-     * @ORM\Column(name="resourcelist", type="string", length=255, nullable=true)
+     * @ORM\OneToMany(targetEntity="CPASimUSante\ExoverrideBundle\Entity\ExoverrideStatConfigData", mappedBy="statconfig", cascade={"all"})
      */
-    protected $resourcelist;
+    protected $datas;
 
     /**
-     * @var string
-     *
-     * @ORM\Column(name="exolist", type="string", length=255, nullable=true)
+     * Class constructor
      */
-    protected $exolist;
+    public function __construct()
+    {
+        $this->datas = new ArrayCollection();
+    }
 
+    /**
+     * Get id
+     *
+     * @return integer
+     */
     public function getId()
     {
         return $this->id;
@@ -85,50 +92,40 @@ class ExoverrideStatConfig
     }
 
     /**
-     * Set resourcelist
+     * Add data
      *
-     * @param string $resourcelist
-     *
-     * @return ExoverrideStatConfig
-     */
-    public function setResourcelist($resourcelist)
-    {
-        $this->resourcelist = $resourcelist;
-
-        return $this;
-    }
-
-    /**
-     * Get resourcelist
-     *
-     * @return string
-     */
-    public function getResourcelist()
-    {
-        return $this->resourcelist;
-    }
-
-    /**
-     * Set exolist
-     *
-     * @param string $exolist
+     * @param ExoverrideStatConfigData $data
      *
      * @return ExoverrideStatConfig
      */
-    public function setExolist($exolist)
+    public function addData(ExoverrideStatConfigData $data)
     {
-        $this->exolist = $exolist;
+        /*       $this->datas[] = $data;
+               //$item->setItemselector($this);
+               return $this;
+       */
+        $data->setStatConfig($this);
 
-        return $this;
+        $this->datas->add($data);
     }
 
     /**
-     * Get exolist
+     * Remove data
      *
-     * @return string
+     * @param ExoverrideStatConfigData $data
      */
-    public function getExolist()
+    public function removeData(ExoverrideStatConfigData $data)
     {
-        return $this->exolist;
+        $this->datas->removeElement($data);
+    }
+
+    /**
+     * Get datas
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getDatas()
+    {
+        return $this->datas;
     }
 }

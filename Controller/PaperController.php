@@ -677,6 +677,7 @@ var_dump($res[0]->getMark());
     }
 
 
+
     /**
      * Prepare complete statistics to be displayed
      *
@@ -731,6 +732,80 @@ var_dump($res[0]->getMark());
             'UJMExoBundle:Paper:testshow.html.twig', array(
                 'datas'   => $datas,
                 'html'   => $html,
+            )
+        );
+    }
+
+    /**
+     * Prepare complete statistics to be displayed
+     *
+     * @param string $resourcedata
+     * @return Response
+     */
+    public function getResultExercisesHtmltest2Action($resourcedata='')
+    {
+        $listexolist = array();
+        if ($resourcedata != ''){
+            //for each group of exercise
+            $list = explode(';', $resourcedata);
+            //get array of exercise
+            foreach ($list as $item){
+                if ($item != ''){
+                    $listexolist[] = explode(',', $item);
+                }
+            }
+        }
+
+        $html = '';
+        $dataall = array();
+
+        foreach($listexolist as $exolist)
+        {
+            $datas = $this->resultsAndStatsForExercisestest($exolist);
+            $dataall[] = $datas;
+
+            foreach($datas['row'] as $e => $exercise)
+            {
+                $html .= '<table class="table table-responsive">';
+                $html .= '<tr><th colspan="2"><b>'.$exercise['exercise'].'</b></th>';
+                $html .= '<th>Moyenne Générale : '.number_format(($exercise['galmean'])*100, 2).'%</th></tr>';
+
+                $html .= '<tr><td colspan="3">Questions : <ul>';
+                foreach($exercise['question'] as $question)
+                {
+                    $html .= '<li>'.$question['name'].'</li>';
+                }
+                $html .= '</ul></td></tr>';
+
+                foreach($exercise['user'] as $u => $userdata)
+                {
+                    $html .= '<tr><td><u>'.$userdata['uname'].'</u></td>';
+                    $html .= ' <td>Moyenne tous essais :  '.number_format(($exercise['user'][$u]['mean'])*100, 2).'%</td>
+                <td>Moyenne dernier essai :  '.number_format(($exercise['avg_last'][$u])*100, 2).'%</td>
+                </tr>';
+
+                    $inc = 1;
+                    $html .= '<tr><td colspan="3">Réponse : <br>';
+                    foreach($userdata['mark'] as $p => $papermark)
+                    {
+                        $html .= 'Essai '.$inc.' ('.$userdata['start'][$p].' - '.$userdata['end'][$p].') => ';
+                        foreach($papermark as $m => $mark)
+                        {
+                            $html .= $userdata['question'][$p][$m] .' : '. number_format(($mark)*100, 2) .'%  - ';
+                        }
+                        $html .= '<br>';
+                        $inc++;
+                    }
+                    $html .= '</td></tr>';
+                }
+                $html .= '</table>';
+            }
+        }
+
+        return $this->render(
+            'UJMExoBundle:Paper:testshow2.html.twig', array(
+                'dataall'   => $dataall,
+                'html'      => $html,
             )
         );
     }
@@ -959,5 +1034,100 @@ $row[$exerciseId]['user'][$uid]['end'][$paperId] = $paper->getEnd()->format('Y-m
             'row'   => $row,
         );
 //die();
+    }
+
+    public function getResultExercisesJsontestAction($resourcedata='', $userdata='')
+    {
+        $userlist = ($userdata == '') ? array() : explode(',', $userdata);
+
+        //list of hexa colors for graph
+        $rgbcolors = array("#000000", "#FFFF00", "#1CE6FF", "#FF34FF", "#FF4A46", "#008941", "#006FA6", "#A30059",
+            "#FFDBE5", "#7A4900", "#0000A6", "#63FFAC", "#B79762", "#004D43", "#8FB0FF", "#997D87",
+            "#5A0007", "#809693", "#FEFFE6", "#1B4400", "#4FC601", "#3B5DFF", "#4A3B53", "#FF2F80",
+            "#61615A", "#BA0900", "#6B7900", "#00C2A0", "#FFAA92", "#FF90C9", "#B903AA", "#D16100",
+            "#DDEFFF", "#000035", "#7B4F4B", "#A1C299", "#300018", "#0AA6D8", "#013349", "#00846F",
+            "#372101", "#FFB500", "#C2FFED", "#A079BF", "#CC0744", "#C0B9B2", "#C2FF99", "#001E09",
+            "#00489C", "#6F0062", "#0CBD66", "#EEC3FF", "#456D75", "#B77B68", "#7A87A1", "#788D66",
+            "#885578", "#FAD09F", "#FF8A9A", "#D157A0", "#BEC459", "#456648", "#0086ED", "#886F4C");
+        //to rgb
+        $colors = array_map(array($this, 'rgb2hex'), $rgbcolors);
+
+        $listexolist = array();
+        if ($resourcedata != ''){
+            //for each group of exercise
+            $list = explode(';', $resourcedata);
+            //get array of exercise
+            foreach ($list as $item){
+                if ($item != ''){
+                    $listexolist[] = explode(',', $item);
+                }
+            }
+        }
+
+        $jsonall = array();
+        $ii = 1;
+        foreach($listexolist as $exolist) {
+            $datas = $this->resultsAndStatsForExercises($exolist, $userlist);
+
+            // name of group
+            $jsonall['label'] = 'Groupe '.$ii; //to be modified : change into directory name (containing exos) or category name (for questions : not interesting) or specific name (into widget setting) ?
+
+
+
+
+
+            $json = array();
+            $json['datasets'] = array();
+            $user = array();
+            $galmean = array();
+            foreach($datas['row'] as $e => $exercice)
+            {
+//            if (in_array($e, $exolist))
+//            {
+                //name of exercise
+//                $json['labels'][] = $exercice['exercise'];
+                $galmean[] = number_format(($exercice['galmean'])*100, 2);
+                foreach($exercice['user'] as $k => $userdata)
+                {
+                    $user[$k]['name'] = $exercice['user'][$k]['uname'];
+                    $user[$k]['mean'][] = number_format(($exercice['user'][$k]['mean'])*100, 2);
+                }
+//            }
+            }
+            $inc = 0;
+            //dataset for group
+            $json['datasets'][] = $this->setObjectForRadarDataset('group', $galmean, $this->rgbacolor($colors[$inc]));
+            $inc++;
+            //datasets for users
+            /*
+            foreach($user as $k => $u)
+            {
+                //display only selected users
+                if (in_array($k, $userlist))
+                {
+                    $json['datasets'][] = $this->setObjectForRadarDataset($u['name'], $u['mean'], $this->rgbacolor($colors[$inc]));
+                    $inc++;
+                }
+            }
+            */
+
+            //for each user
+            foreach($userlist as $u)
+            {
+                //is the user in this exolist ?
+                if (in_array($u, $user))
+                {
+
+                }
+                //if not, set a null value
+                else{
+
+                }
+            }
+
+            $ii++;
+        }
+
+        return new JsonResponse($json);
     }
 }

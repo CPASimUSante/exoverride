@@ -19,10 +19,15 @@ class ExoverrideStatConfigType extends AbstractType
                 'required' => true,
                 'label' => 'userlist_for_graph'
             ))
-            ->add('resourcelist', 'text', array(
-                'required' => true,
-                'label' => 'resourcelist_for_graph'
-            ))
+            ->add(
+                'datas', 'collection', array(
+                    'type'          => new ExoverrideStatConfigDataType(),
+                    'by_reference'  => false,
+                    'prototype'     => true,
+                    'allow_add'     => true,
+                    'allow_delete'  => true,
+                )
+            )
         ;
     }
     

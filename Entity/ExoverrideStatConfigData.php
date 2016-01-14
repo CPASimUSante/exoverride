@@ -2,12 +2,10 @@
 namespace CPASimUSante\ExoverrideBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Claroline\CoreBundle\Entity\Widget\WidgetInstance;
-use Claroline\CoreBundle\Entity\Resource\ResourceNode;
-use Doctrine\Common\Collections\ArrayCollection;
+use CPASimUSante\ExoverrideBundle\Entity\ExoverrideStatConfig;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="CPASimUSante\ExoverrideBundle\Repository\ExoverrideStatConfigDataRepository")
  * @ORM\Table(name="cpasimusante__exoverride_stat_configuration_data")
  */
 class ExoverrideStatConfigData
@@ -22,34 +20,24 @@ class ExoverrideStatConfigData
     /**
      * @var string
      *
-     * @ORM\ManyToOne(targetEntity="Claroline\CoreBundle\Entity\Resource\ResourceNode")
-     * @ORM\JoinColumn(name="resource_node_id", referencedColumnName="id")
+     * @ORM\Column(name="resourcelist", type="string", length=255, nullable=true)
      */
-    protected $resourceNode;
+    protected $resourcelist;
 
     /**
-     * Set resourceNode
+     * @var string
      *
-     * @param ResourceNode $resourceNode
-     *
-     * @return ExoverrideStatConfig
+     * @ORM\Column(name="exolist", type="string", length=255, nullable=true)
      */
-    public function setResourceNode(ResourceNode $resourceNode = null)
-    {
-        $this->resourceNode = $resourceNode;
-
-        return $this;
-    }
+    protected $exolist;
 
     /**
-     * Get resourceNode
+     * @var statconfig
      *
-     * @return ResourceNode
+     * @ORM\ManyToOne(targetEntity="CPASimUSante\ExoverrideBundle\Entity\ExoverrideStatConfig", inversedBy="datas")
+     * @ORM\JoinColumn(name="statconfig_id", referencedColumnName="id")
      */
-    public function getResourceNode()
-    {
-        return $this->resourceNode;
-    }
+    protected $statconfig;
 
     /**
      * Get id
@@ -59,5 +47,77 @@ class ExoverrideStatConfigData
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * Set resourcelist
+     *
+     * @param string $resourcelist
+     *
+     * @return ExoverrideStatConfig
+     */
+    public function setResourcelist($resourcelist)
+    {
+        $this->resourcelist = $resourcelist;
+
+        return $this;
+    }
+
+    /**
+     * Get resourcelist
+     *
+     * @return string
+     */
+    public function getResourcelist()
+    {
+        return $this->resourcelist;
+    }
+
+    /**
+     * Set exolist
+     *
+     * @param string $exolist
+     *
+     * @return ExoverrideStatConfigData
+     */
+    public function setExolist($exolist)
+    {
+        $this->exolist = $exolist;
+
+        return $this;
+    }
+
+    /**
+     * Get exolist
+     *
+     * @return string
+     */
+    public function getExolist()
+    {
+        return $this->exolist;
+    }
+
+    /**
+     * Set mainconfig
+     *
+     * @param ExoverrideStatConfig $statconfig
+     *
+     * @return ExoverrideStatConfigData
+     */
+    public function setStatConfig(ExoverrideStatConfig $statconfig = null)
+    {
+        $this->statconfig = $statconfig;
+
+        return $this;
+    }
+
+    /**
+     * Get mainconfig
+     *
+     * @return ExoverrideStatConfig
+     */
+    public function getStatConfig()
+    {
+        return $this->statconfig;
     }
 }

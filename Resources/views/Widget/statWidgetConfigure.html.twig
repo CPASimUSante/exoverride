@@ -1,5 +1,15 @@
 {%  if userCanAccessWs is not empty %}
     {% form_theme form 'ClarolineCoreBundle::form_theme_no_label.html.twig' %}
+
+    {% macro stat_widget_prototype(form, inc) %}
+        <table class="table">
+            <tr>
+                <td class="isel_widget">{{ form_widget(form.resourcelist) }}</td>
+                <td>{{ form_errors(form.resourcelist) }}</td>
+            </tr>
+        </table>
+    {% endmacro %}
+
     <form role="form"
           class="form-horizontal"
           action="{{ path('cpasimusante_statwidget_config', {'widgetInstance': widgetInstance.getId()}) }}"
@@ -20,12 +30,12 @@
                     </td>
                 </tr>
                 <tr id="pick-exo-for-stats">
-                    <td class="isel_label">{{ form.resourcelist.vars.label|trans({}, 'resource') }}{{ form_widget(form.resourcelist) }}</td>
-                    <td class="isel_widget"></td>
-                    <td class="isel_extra">
-                        <a class="btn btn-primary" id="pick-exo-for-stats-btn" title="{{ 'pick_exo_for_stats'|trans({}, 'resource') }}"><i class="fa fa-folder-open pointer-hand pull-right"
-                               data-placement="left"
-                               ></i></a>
+                    <td colspan="3">
+                        <ul class="isel-item" data-prototype="{{ _self.stat_widget_prototype(form.datas.vars.prototype)|e }}">
+                            {% for inc, data in form.datas %}
+                                <li class="item" id="tdres{{ inc }}" data-rid="{{ inc }}">{{ _self.stat_widget_prototype(data, inc) }}</li>
+                            {% endfor %}
+                        </ul>
                     </td>
                 </tr>
             </table>
@@ -43,7 +53,105 @@
         var manager = window.Claroline.ResourceManager;
         var su = $('#cpasimusante_exoverridebundle_exoverridestatconfig_userlist').val();
         var selectedUsers = (su === '') ? [] : su.split(',');
-        var selectedResources = [{{ resourcelist }}];
+        var selectedResources = {{ resourcelist|raw }};
+
+        $(document).ready(function() {
+            var $collectionHolder = $('ul.isel-item');
+            var $addItemLink = $('<a href="#" class="add_item_link btn btn-info"><span class="fa fa-plus"></span> Ajouter des ressources</a>');
+            var $newLink = $('<li></li>').append($addItemLink);
+
+            // add a delete link to all of the existing Item form li elements
+            $collectionHolder.find('li.item').each(function() {
+                addResourcePicker(this);
+                addItemFormDeleteLink(this);
+            });
+
+            // add the "add an item" anchor and li to the tags ul
+            $collectionHolder.append($newLink);
+
+            // count the current form inputs we have (e.g. 2), use that as the new
+            // index when inserting a new item (e.g. 2)
+            $collectionHolder.data('index', $collectionHolder.find(':input').length);
+
+            $addItemLink.on('click', function(e) {
+                // prevent the link from creating a "#" on the URL
+                e.preventDefault();
+
+                // add a new item form
+                addItemForm($collectionHolder, $newLink);
+            });
+
+            function addItemForm($collectionHolder, $newLink) {
+                // Get the data-prototype
+                var prototype = $collectionHolder.data('prototype');
+
+                // get the new index
+                var index = $collectionHolder.data('index');
+
+                // Replace '__name__' in the prototype's HTML to
+                // instead be a number based on how many items we have
+                var newForm = prototype.replace(/__name__/g, index);
+
+                // increase the index with one for the next item
+                $collectionHolder.data('index', index + 1);
+
+                // Display the form in the page in an li, before the "Add an Item" link li
+                var $newFormLi = $('<li class="item" id="tdres'+index+'" data-rid="'+index+'"></li>').append(newForm);
+
+                // also add a remove button, just for this example
+                //$newFormLi.append('<a href="#" class="remove-item btn btn-danger">x</a>');
+
+                $newLink.before($newFormLi);
+
+                addResourcePicker($newFormLi);
+                // add a delete link to the new form
+                addItemFormDeleteLink($newFormLi);
+
+                // handle the removal
+                $('.remove-item').click(function(e) {
+                    e.preventDefault();
+                    $(this).parent().remove();
+                    return false;
+                });
+            }
+
+            function addResourcePicker($itemFormLi) {
+                var rid = $($itemFormLi).data("rid");
+                var $respickForm = $('<td class="isel_extra"><a class="btn btn-primary pick-exo-for-stats-btn" id="pick-exo-for-stats-btn-'+rid+'" title="{{ 'pick_exo_for_stats'|trans({}, 'resource') }}"><i class="fa fa-folder-open pointer-hand pull-right" data-placement="left"></i></a></td>');
+                $($itemFormLi).find("tbody tr").append($respickForm);
+
+                //pick exercise
+                $('#pick-exo-for-stats-btn-'+rid).on('click', function () {
+                    var that = $(this);
+                    if (!manager.hasPicker('exoRadarPicker'+rid)) {
+                        manager.createPicker('exoRadarPicker'+rid, {
+                            callback: function (nodes) {
+                                $('#tdres'+rid+' .isel_widget input').val(_.keys(nodes));
+                            },
+                            isPickerMultiSelectAllowed: true,
+                            isDirectorySelectionAllowed: false,
+                            typeWhiteList: ['ujm_exercise']
+                            //restrictForOwner: true
+                        }, true);
+                    } else {
+                        manager.picker('exoRadarPicker'+rid, 'open');
+                    }
+                });
+            }
+
+            function addItemFormDeleteLink($itemFormLi) {
+                var $removeFormA = $('<td><a href="#" class="remove-item btn btn-danger"><span class="fa fa-trash"></span> Supprimer</a></td>');
+                $($itemFormLi).find("tbody tr").append($removeFormA);
+
+                $($removeFormA).find("a").on('click', function(e) {
+                    // prevent the link from creating a "#" on the URL
+                    e.preventDefault();
+                    // remove the li for the tag form
+                    $itemFormLi.remove();
+                });
+            }
+        });
+
     </script>
     <script src='{{ asset('bundles/cpasimusanteexoverride/js/exoverride_configure.js') }}' type="text/javascript"></script>
 {% else %}

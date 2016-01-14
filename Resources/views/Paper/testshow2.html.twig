@@ -1,0 +1,45 @@
+{% set layout = "ClarolineCoreBundle:Workspace:layout.html.twig" %}
+
+{% if isDesktop() %}
+    {% set layout = "ClarolineCoreBundle:Desktop:layout.html.twig" %}
+{% endif %}
+
+{% extends layout %}
+
+{% block title %} {{ 'paper_list' | trans }} {% endblock %}
+
+{% block section_content %}
+
+    <div class="panel-heading">
+        <h3 class="panel-title">html EXTRA</h3>
+    </div>
+
+    <div class="panel-body">
+        {% for datas in dataall %}
+            {% for eid, exercice in datas['row'] %}
+                exercise= {{ exercice['exercise'] }}<br>
+                galmean= {{ exercice['galmean'] }}<br>
+                {% for uid, user in exercice['user'] %}
+                    {% if exercice['avg_last'][uid] is defined %}
+                        <b>Moyenne dernier essai : {{ exercice['avg_last'][uid] }}</b><br>
+                    {% endif %}
+                    uname = {{ user['uname'] }} -    nbTries= {{ user['nbTries'] }} - moyenne tous essais= {{ user['mean'] }}<br>
+                    {% for papermark in user['mark'] %}
+                        {% for mark in papermark %}
+                        {{mark }} --
+                        {% endfor %}<br>
+                    {% endfor %}<br>
+                    {% for question in user['question'] %}
+                        {% for q in question %}
+                            {{q }} --
+                        {% endfor %}
+                    {% endfor %}<br>
+                {% endfor %}
+                <br>
+                {{ dump(exercice['question']) }}
+                <br><br>
+            {%  endfor  %}
+        {%  endfor  %}
+        {{ html|raw }}
+    </div>
+{% endblock %}

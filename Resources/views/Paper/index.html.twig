@@ -44,20 +44,24 @@
             </a>
             <a href="{{ path('exoverride_fixtures', { }) }}" class="btn btn-primary">Fixtures</a>
 
-            {#
                         <a href="{{ path('ujm_paper_export_complete_results', { 'exerciseId': exoID }) }}"
                            class="btn btn-primary">
                             {{ 'export_csv_all_results' | trans({}, 'messages') }}
                         </a>
-                        <a href="{{ path('ujm_paper_show_all_results_test', { resourcedata:'6,7,8,9,10'}) }}"
-                           class="btn btn-primary">
-                            {{ 'Xhtml' | trans({}, 'messages') }}
-                        </a>
-                        <a href="{{ path('ujm_paper_export_all_results_cvs_test', { resourcedata:'6,7,8,9,10'}) }}"
-                           class="btn btn-primary">
-                            {{ 'Xcsv' | trans({}, 'messages') }}
-                        </a>
-            #}
+
+            <a href="{{ path('ujm_paper_show_all_results_test2', { resourcedata:'6,7,8,9,10;1,2,3;11'}) }}"
+               class="btn btn-primary">
+                {{ 'Xhtml' | trans({}, 'messages') }}
+            </a>
+            {#                <a href="{{ path('ujm_paper_show_all_results_test', { resourcedata:'6,7,8,9,10'}) }}"
+                               class="btn btn-primary">
+                                {{ 'Xhtml' | trans({}, 'messages') }}
+                            </a>
+                            <a href="{{ path('ujm_paper_export_all_results_cvs_test', { resourcedata:'6,7,8,9,10'}) }}"
+                               class="btn btn-primary">
+                                {{ 'Xcsv' | trans({}, 'messages') }}
+                            </a>
+                #}
             {% if _resource.published == FALSE %}
                 <a href="{{ path('ujm_exercise_delete_all_paper', { 'id': exoID }) }}"
                    class="btn btn-primary">

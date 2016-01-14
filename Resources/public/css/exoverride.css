@@ -3,3 +3,4 @@
 .exportgraph{display: none}
 .containerradar{width: 100%;position:relative}
 #containerradardata{}
+.isel-item { list-style-type:none;padding: 0}

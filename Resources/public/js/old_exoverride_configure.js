@@ -39,4 +39,26 @@
         $('#cpasimusante_exoverridebundle_exoverridestatconfig_userlist').val(userIds);
     };
 
+    //pick exercise
+    $('#pick-exo-for-stats').on('click', '#pick-exo-for-stats-btn', function () {
+        var that = $(this);
+        if (!manager.hasPicker('exoRadarPicker')) {
+            manager.createPicker('exoRadarPicker', {
+                callback: function (nodes) {
+                    var resourceAdded = '';
+                    for (var id in nodes) {
+                        resourceAdded += nodes[id][3]+"<br>";//the resource with path
+                    }
+                    $('#pick-exo-for-stats .isel_widget').html(resourceAdded);
+                    $('#cpasimusante_exoverridebundle_exoverridestatconfig_resourcelist').val(_.keys(nodes));
+                },
+                isPickerMultiSelectAllowed: true,
+                isDirectorySelectionAllowed: false,
+                typeWhiteList: ['ujm_exercise']
+                //restrictForOwner: true
+            }, true);
+        } else {
+            manager.picker('exoRadarPicker', 'open');
+        }
+    });
 }());

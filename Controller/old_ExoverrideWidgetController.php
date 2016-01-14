@@ -16,9 +16,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
-use Doctrine\Common\Collections\ArrayCollection;
 
-class ExoverrideWidgetController extends Controller
+class old_ExoverrideWidgetController extends Controller
 {
     private $formFactory;
     private $userManager;
@@ -63,24 +62,20 @@ class ExoverrideWidgetController extends Controller
     public function userStatDisplayAction(WidgetInstance $widgetInstance)
     {
         $em = $this->get('doctrine.orm.entity_manager');
-
-        $widgetExoverride = $em->getRepository('CPASimUSanteExoverrideBundle:ExoverrideStatConfig')
+        $widgetExoverrideRadar = $em->getRepository('CPASimUSanteExoverrideBundle:ExoverrideStatConfig')
             ->findOneByWidgetInstance($widgetInstance);
 
-        $userlist      = '';
-        $resourcelist  = array();
-
         //parameters needed to display graph
-        if ($widgetExoverride !== null)
+        if ($widgetExoverrideRadar !== null)
         {
-            $userlist      = $widgetExoverride->getUserList();
-            $datas         = $widgetExoverride->getDatas();
-            foreach($datas as $data)
-            {
-                $resourcelist[] = $data->getExolist();
-            }
+            $userlist      = $widgetExoverrideRadar->getUserlist();
+            $resourcelist  = $widgetExoverrideRadar->getExolist();
         }
-
+        else
+        {
+            $userlist      = '';
+            $resourcelist  = '';
+        }
         $exoverrideService = $this->container->get('cpasimusante.exoverride_services');
         //list of user roles
         $roleList = $exoverrideService->userHasRole();
@@ -94,7 +89,7 @@ class ExoverrideWidgetController extends Controller
         return array(
             'widgetInstance'    => $widgetInstance,
             'userlist'          => $userlist,
-            'resourcelist'      => json_encode($resourcelist),
+            'resourcelist'      => $resourcelist,
             'userCanAccessWs'   => $userCanAccessWs,
             'roleList'          => $roleList,
         );
@@ -130,71 +125,36 @@ class ExoverrideWidgetController extends Controller
         {
             $em = $this->get('doctrine.orm.entity_manager');
 
-            $widgetExoverride = $em->getRepository('CPASimUSanteExoverrideBundle:ExoverrideStatConfig')
+            $widgetExoverrideRadar = $em->getRepository('CPASimUSanteExoverrideBundle:ExoverrideStatConfig')
                 ->findOneByWidgetInstance($widgetInstance);
 
-            // Create an ArrayCollection of the current Data objects in the database
-            $originalDatas = new ArrayCollection();
-            $resourcelist = array();
-
-            //first run
-            if (null === $widgetExoverride) {
-                $widgetExoverride = new ExoverrideStatConfig();
-                $widgetExoverride
+            if (null === $widgetExoverrideRadar) {
+                $widgetExoverrideRadar = new ExoverrideStatConfig();
+                $widgetExoverrideRadar
                     ->setWidgetInstance($widgetInstance);
             }
-            //retrieve data before
-            else
-            {
-                foreach ($widgetExoverride->getDatas() as $data) {
-                    $originalDatas->add($data);
-                }
 
-                foreach ($originalDatas as $data) {
-                    $resourcelist[] = $data->getResourcelist();
-                }
-            }
-            $form = $this->formFactory->create(new ExoverrideStatConfigType(), $widgetExoverride);
+            $userlist = $widgetExoverrideRadar->getUserList();
+            $resourcelist = $widgetExoverrideRadar->getResourcelist();
+
+            $form = $this->formFactory->create(new ExoverrideStatConfigType(), $widgetExoverrideRadar);
             $form->handleRequest($request);
 
-            $userlist = $widgetExoverride->getUserList();
-
             if ($form->isValid()) {
+                $widgetExoverrideRadar = $form->getData();
                 //Need the exercise list corresponding to resource list to persist
                 //in order to avoid having a request each time
                 $services = $this->container->get('cpasimusante.exoverride_services');
-                $widgetExoverride = $form->getData();
-
-                // remove the relationship between the data and the ExoverrideStatConfig
-                foreach ($originalDatas as $data) {
-
-//echo 'data->getResourcelist()<pre>';var_dump($data->getResourcelist());echo '</pre>';
-
-                  /*  if (false === $widgetExoverride->getDatas()->contains($data)) {
-                        // in a a many-to-one relationship, remove the relationship
-                        $data->setExoverrideStatConfig(null);
-                        $em->persist($data);
-                        // to delete the Item entirely, you can also do that
-                        $em->remove($data);
-                    }*/
+                $exercices = $services->getExoList($widgetExoverrideRadar->getResourcelist());
+                $list = array();
+                foreach ($exercices as $exos)
+                {
+                    $list[] = $exos->getId();
                 }
-                $em->persist($widgetExoverride);
+                $exolist = implode(',', $list);
+                $widgetExoverrideRadar->setExolist($exolist);
+                $em->persist($widgetExoverrideRadar);
                 $em->flush();
-
-                foreach ($widgetExoverride->getDatas() as $data) {
-                    $resourcelist[] = $data->getResourcelist();
-                    $exercices = $services->getExoList($data->getResourcelist());
-                    $list = array();
-                    foreach ($exercices as $exos)
-                    {
-                        $list[] = $exos->getId();
-                    }
-                    $exolist = implode(',', $list);
-                    $data->setExolist($exolist);
-                }
-                $em->persist($widgetExoverride);
-                $em->flush();
-
                 return new Response('', Response::HTTP_NO_CONTENT);
             }
 
@@ -204,7 +164,7 @@ class ExoverrideWidgetController extends Controller
                     'form'              => $form->createView(),
                     'widgetInstance'    => $widgetInstance,
                     'userlist'          => $userlist,
-                    'resourcelist'      => json_encode($resourcelist),
+                    'resourcelist'      => $resourcelist,
                     'userCanAccessWs'   => $userCanAccessWs
                 )
             );

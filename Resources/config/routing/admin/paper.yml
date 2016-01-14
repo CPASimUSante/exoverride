@@ -42,9 +42,21 @@ ujm_paper_show_all_results_test:
     options:
         expose: true
 
+ujm_paper_show_all_results_test2:
+    pattern:  /show/all_results/htmltest2/{resourcedata}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesHtmltest2" }
+    options:
+        expose: true
+
 ujm_paper_export_all_results_cvs_test:
     pattern:  /export/all_results/csvtest/{resourcedata}
     defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesCsvtest" }
+    options:
+        expose: true
+
+ujm_paper_export_all_results_json_test:
+    pattern:  /export/all_results_test/json/ul/{userdata}/rl/{resourcedata}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesJsontest" }
     options:
         expose: true
 

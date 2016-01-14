@@ -28,26 +28,10 @@ class ExoverrideStatConfigDataType extends AbstractType
         $orderedBy      = 'name';
 
         $builder
-            ->add(
-                'resourceNode', 'entity', [
-                    'label'         => 'Ressource',
-                    'class'         => 'ClarolineCoreBundle:Resource\ResourceNode',
-                    'choice_label'  => 'name',
-                    'empty_value'   => 'Choisissez les ressources',
-                    'query_builder' => function(\Claroline\CoreBundle\Repository\ResourceNodeRepository $er) use ($namePattern, $orderedBy) {
-                        $qb = $er->createQueryBuilder('rn')
-                            ->where('rn.resourceType = :resourcetype')
-                            ->setParameter('resourcetype', 'ujm_exercise');
-                        if ($namePattern != '')
-                        {
-                            $qb->andWhere('rn.name LIKE :namePattern')
-                                ->setParameter('namePattern', $namePattern);
-                        }
-                        $qb->orderBy('rn.'.$orderedBy, 'ASC');
-                        return $qb;
-                    }
-                ]
-            );
+            ->add('resourcelist', 'text', array(
+                'required' => true,
+                'label' => 'resourcelist_for_graph'
+            ));
     }
     
     /**

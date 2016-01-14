@@ -52,7 +52,10 @@ class ExoverrideServices
                        ->getRepository('UJMExoBundle:Exercise')
                        ->findByResourceNode($resources);
     }
-
+/*
+DELETE FROM `cpasimusante__exoverride_stat_configuration_data`;
+DELETE FROM `cpasimusante__exoverride_stat_configuration`;
+ */
     /**
      * Query the correct Exercises for access rights to the resource
      *
