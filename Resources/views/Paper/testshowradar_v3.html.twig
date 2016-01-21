@@ -1,0 +1,34 @@
+{% set layout = "ClarolineCoreBundle:Workspace:layout.html.twig" %}
+
+{% if isDesktop() %}
+    {% set layout = "ClarolineCoreBundle:Desktop:layout.html.twig" %}
+{% endif %}
+
+{% extends layout %}
+
+{% block title %} {{ 'paper_list' | trans }} {% endblock %}
+
+{% block section_content %}
+
+    <div class="panel-heading">
+        <h3 class="panel-title">RADAR v3</h3>
+    </div>
+
+    <div class="panel-body">
+        <a class="btn btn-primary btn-sm showcsv" id="showradar">Afficher le graphique</a>
+    <span class="userresource" id="userresource" data-user="1,2" data-resource="6,7,8,9,10;1,2,3;11"></span>
+    <div class="containerradar" id="containerradar"><canvas id="radaranalytics" class="radarstat" height="350" width="300"></canvas></div>
+</div>
+{% endblock %}
+
+{# has to be after this html ! #}
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('bundles/cpasimusantechartnew/js/ChartNew.js') | raw }}"></script>
+    <script src="{{ asset('bundles/cpasimusanteexoverride/js/testexoverride_v3.js') | raw }}"></script>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ asset('bundles/cpasimusanteexoverride/css/exoverride.css') }}">
+{% endblock %}

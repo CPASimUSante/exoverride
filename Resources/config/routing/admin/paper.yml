@@ -63,3 +63,54 @@ ujm_paper_export_all_results_json_test:
 exoverride_fixtures:
     pattern:  /fixture/load
     defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:loadFixtures" }
+
+#V3
+ujm_paper_show_all_results_v3:
+    pattern:  /show/all_results/html_v3/{resourcedata}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesHtmlV3" }
+    options:
+        expose: true
+
+#V3
+ujm_paper_export_all_results_cvs_v3:
+    pattern:  /export/all_results/csv_v3/{resourcedata}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesCsvV3" }
+    options:
+        expose: true
+#V3
+json_test_v3:
+    pattern:  /call_radar_v3
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:callJsonV3" }
+    options:
+        expose: true
+
+#V3
+ujm_paper_export_all_results_json_v3:
+    pattern:  /export/all_results_test/json_v3/ul/{userdata}/rl/{resourcedata}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesJsonV3" }
+    options:
+        expose: true
+
+#V4
+# display html results
+ujm_paper_show_all_results_v4:
+    pattern:  /show/all_results/html_v4/{resourcedata}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesHtmlV3" }
+    options:
+        expose: true
+
+#V4
+# gather data for radar display
+ujm_paper_export_all_results_json_v4:
+    pattern:  /export/all_results_test/json_v4/ul/{userdata}/rl/{resourcedata}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesJsonV3" }
+    options:
+        expose: true
+
+#V4
+# url to generate csv export
+ujm_paper_export_all_results_csv_v4:
+    pattern:  /export/all_results/csv_v4/{resourcedata}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesCsvV3" }
+    options:
+        expose: true

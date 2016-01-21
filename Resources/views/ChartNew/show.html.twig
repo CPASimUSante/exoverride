@@ -7,7 +7,7 @@
             <a class="btn btn-primary btn-sm exo-statistics-results" id="exo-statistics-results{{ widgetInstance.getId() }}">
                 {{ 'show_result_stats_html' | trans({}, 'messages') }}
             </a>
-            <a href="{{ path('ujm_paper_export_all_results_cvs', {resourcedata: resourcelist}) }}"
+            <a href="{{ path('ujm_paper_export_all_results_csv_v4', {resourcedata: resourcelist}) }}"
                class="btn btn-primary btn-sm" id="export_all_results_cvs{{ widgetInstance.getId() }}">
                 {{ 'export_results_stats_csv' | trans({}, 'messages') }}
             </a>
@@ -19,10 +19,12 @@
     <div class="containerradar" id="containerradar{{ widgetInstance.getId() }}"><canvas id="radaranalytics{{ widgetInstance.getId() }}" class="radarstat" height="350" width="300"></canvas></div>
     {#<iframe class="activity-iframe" height="500" src="{{ path('ujm_paper_show_radar', {}) }}"></iframe>#}
 </div>
+
 {# has to be after this html ! i don't know why #}
 {% block javascripts %}
     <script src="{{ asset('bundles/cpasimusantechartnew/js/ChartNew.js') | raw }}"></script>
-    <script src="{{ asset('bundles/cpasimusanteexoverride/js/exoverride-new.js') | raw }}"></script>
+    <script src="{{ asset('bundles/cpasimusanteexoverride/js/exoverride-v4.js') | raw }}"></script>
+  {#  <script src="{{ asset('bundles/cpasimusanteexoverride/js/exoverride-new.js') | raw }}"></script> #}
 {% endblock %}
 
 {% block stylesheets %}

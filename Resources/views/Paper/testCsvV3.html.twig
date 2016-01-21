@@ -1,0 +1,20 @@
+{% set layout = "ClarolineCoreBundle:Workspace:layout.html.twig" %}
+
+{% if isDesktop() %}
+    {% set layout = "ClarolineCoreBundle:Desktop:layout.html.twig" %}
+{% endif %}
+
+{% extends layout %}
+
+{% block title %} {{ 'paper_list' | trans }} {% endblock %}
+
+{% block section_content %}
+
+    <div class="panel-heading">
+        <h3 class="panel-title">Export CSV v3</h3>
+    </div>
+
+    <div class="panel-body">
+        {{ dump(tmp|raw) }}
+    </div>
+{% endblock %}
