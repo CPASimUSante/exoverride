@@ -16,8 +16,16 @@
 
     <div class="panel-body">
         <a class="btn btn-primary btn-sm showcsv" id="showradar">Afficher le graphique</a>
-    <span class="userresource" id="userresource" data-user="1,2" data-resource="6,7,8,9,10;1,2,3;11"></span>
+
+        <a id="exo-statistics-results" class="btn btn-primary">
+            {{ 'show_result_stats_html' | trans({}, 'messages') }}
+        </a>
+
+    <span class="userresource" id="userresource" data-user="1,2" data-resource="1,2,3;6,7,8,9,10;11"></span>
     <div class="containerradar" id="containerradar"><canvas id="radaranalytics" class="radarstat" height="350" width="300"></canvas></div>
+        <div class="containerradardata" id="containerradardata"></div>
+
+
 </div>
 {% endblock %}
 

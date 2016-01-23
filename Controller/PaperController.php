@@ -1536,13 +1536,7 @@ $tmp[$eid]['user'][$k]['question'][$pid] = $paperresponse;
                 $html .= $htmltmp;
             }
         }
-
-        return $this->render(
-            'UJMExoBundle:Paper:testshow_v3.html.twig', array(
-                'dataall'   => $dataall,
-                'html'      => $html,
-            )
-        );
+        return new JsonResponse($html);
     }
 
     /**
@@ -1737,6 +1731,15 @@ $tmp[$eid]['user'][$k]['question'][$pid] = $paperresponse;
     public function callJsonV3Action()
     {
         return $this->render('UJMExoBundle:Paper:testshowradar_v3.html.twig', array() );
+    }
+
+    public function displayWindowAction($wid = 0, $resourcedata='', $userdata='')
+    {
+        return $this->render('UJMExoBundle:Paper:displayRadarData.html.twig', array(
+            'wid'           => $wid,
+            'resourcelist'  => $resourcedata,
+            'userlist'      => $userdata
+        ));
     }
 
     public function getResultExercisesJsonV3Action($resourcedata='', $userdata='')

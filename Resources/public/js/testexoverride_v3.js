@@ -14,6 +14,7 @@
     resourcedata    = $('#userresource').data('resource');
     console.log("userdata");console.log(userdata);
     console.log("resourcedata");console.log(resourcedata);
+
             //Get the data and draw the chart
             $('#showradar').on('click', function(){
                 $.ajax({
@@ -31,7 +32,17 @@
                 });
             });
 
-
+    //show the list of statistic results
+    $('#exo-statistics-results').on('click', function(){
+        $.ajax({
+            type:"GET",
+            url: Routing.generate('ujm_paper_show_all_results_v4', {resourcedata: resourcedata}),
+            success: function(response) {
+                $('#containerradardata').html(response);
+            },
+            error: function(jqXHR, textStatus, errorThrown) { }
+        });
+    });
 
     //function for creating custom tooltip for datasets
     function annotateAllX(area,ctx,data,statData,posi,posj,othervars) {

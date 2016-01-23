@@ -114,3 +114,10 @@ ujm_paper_export_all_results_csv_v4:
     defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:getResultExercisesCsvV3" }
     options:
         expose: true
+
+
+ujm_paper_open_blank_radar:
+    pattern:  /open/target/{wid}/rd/{resourcedata}/ud/{userdata}
+    defaults: { _controller: "CPASimUSanteExoverrideBundle:Paper:displayWindow" }
+    options:
+        expose: true

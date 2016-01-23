@@ -11,6 +11,13 @@
                class="btn btn-primary btn-sm" id="export_all_results_cvs{{ widgetInstance.getId() }}">
                 {{ 'export_results_stats_csv' | trans({}, 'messages') }}
             </a>
+
+
+            <a href="{{ path('ujm_paper_open_blank_radar', {wid: widgetInstance.getId(), resourcedata: resourcelist, userdata: userlist}) }}" target="_blank"
+               class="btn btn-primary btn-sm" id="export_blank_for_radar{{ widgetInstance.getId() }}">
+                {{ 'export_blank_for_radar' | trans({}, 'messages') }}
+            </a>
+
         {% endif %}
     </p>
 

@@ -68,7 +68,7 @@ class ExoverrideWidgetController extends Controller
             ->findOneByWidgetInstance($widgetInstance);
 
         $userlist      = '';
-        $resourcelist  = array();
+        $resourcelist  = '';
 
         //parameters needed to display graph
         if ($widgetExoverride !== null)
@@ -77,8 +77,9 @@ class ExoverrideWidgetController extends Controller
             $datas         = $widgetExoverride->getDatas();
             foreach($datas as $data)
             {
-                $resourcelist[] = $data->getExolist();
+                $resourcelist .= $data->getExolist().";";
             }
+            $resourcelist = trim($resourcelist, ";");
         }
 
         $exoverrideService = $this->container->get('cpasimusante.exoverride_services');
@@ -94,7 +95,7 @@ class ExoverrideWidgetController extends Controller
         return array(
             'widgetInstance'    => $widgetInstance,
             'userlist'          => $userlist,
-            'resourcelist'      => json_encode($resourcelist),
+            'resourcelist'      => $resourcelist,
             'userCanAccessWs'   => $userCanAccessWs,
             'roleList'          => $roleList,
         );

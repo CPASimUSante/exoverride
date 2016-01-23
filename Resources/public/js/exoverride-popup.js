@@ -10,10 +10,10 @@
     var radarcontent;
 
     //for each of the widget
-    $('.radarcontent').each(function(index){
-        widgetId = $(this).data('widget-instance');
 
-        radarcontent = $(this);
+        widgetId = $(".radarcontent").data('widget-instance');
+
+        radarcontent = $(".radarcontent");
         if (checkRadarAccess(widgetId))
         {
             $(radarcontent).hide();     // !!!
@@ -23,22 +23,20 @@ console.log('++widgetId'+widgetId);
 console.log($(radarcontent));
 
             //show the list of statistic results
-            $('#exo-statistics-results'+widgetId).on('click', function(){
+            $('#exo-statistics-results').on('click', function(){
                 var that = $(this);
                 $.ajax({
                     type:"GET",
                     url: Routing.generate('ujm_paper_show_all_results_v4', {resourcedata: resourcedata}),
                     success: function(response) {
-                        $('#containerradardata'+widgetId).html(response);
-                        that.attr('target', '_blank');
-                        console.log("blank");
+                        $('#containerradardata').html(response);
                     },
                     error: function(jqXHR, textStatus, errorThrown) { }
                 });
             });
 
             ///Get the data and Draw the chart
-            $('#showcsv'+widgetId).on('click', function(){
+            $('#showcsv').on('click', function(){
                 $.ajax({
                     type:"GET",
                     url: Routing.generate('ujm_paper_export_all_results_json_v4', {userdata:userdata, resourcedata:resourcedata}),
@@ -55,16 +53,15 @@ console.log($(radarcontent));
         else
         {
             $(radarcontent).hide();
-            $('#radarmessage'+widgetId).html('Choose users and exercise in the widget parameters <span class="fa fa-pencil"></span> to display the graphics');
+            $('#radarmessage').html('Choose users and exercise in the widget parameters <span class="fa fa-pencil"></span> to display the graphics');
         }
-    });
 
     function checkRadarAccess(widgetId)
     {
         //parameters to be sent to Chart
 
-        userdata        = $('#userresource'+widgetId).data('user');
-        resourcedata    = $('#userresource'+widgetId).data('resource').replace(/(^")|("$)/g, "");
+        userdata        = $('#userresource').data('user');
+        resourcedata    = $('#userresource').data('resource');
 console.log('widgetId'+widgetId);
 console.log('userdata'+userdata);
 console.log('resourcedata'+resourcedata);
@@ -98,13 +95,13 @@ console.log('resourcedata'+resourcedata);
             ,responsive: true
         };
         var myRadar = new Chart(
-            document.getElementById('radaranalytics'+widgetId)
+            document.getElementById('radaranalytics')
             .getContext("2d")
         ).Radar(radarChartData, options);
     }
 
-    $('#exportgraph'+widgetId).on('click', function(){
-        downloadCanvas(this, 'radaranalytics'+widgetId, 'radar.png');
+    $('#exportgraph').on('click', function(){
+        downloadCanvas(this, 'radaranalytics', 'radar.png');
     });
 
     function downloadCanvas(link, canvasId, filename) {
