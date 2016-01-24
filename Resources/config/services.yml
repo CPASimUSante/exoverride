@@ -10,7 +10,7 @@ services:
 
     cpasimusante_exoverride.listener.exoverride_listener:
         class: CPASimUSante\ExoverrideBundle\Listener\ExoverrideListener
-        alls:
+        calls:
             - [setContainer, ["@service_container"]]
         tags:
             - { name: kernel.event_listener, event: plugin_options_exoverridebundle,      method: onAdministrate }

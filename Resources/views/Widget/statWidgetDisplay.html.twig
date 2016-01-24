@@ -1,5 +1,9 @@
 {%  if (userCanAccessWs is not empty) %}
-    {% include "CPASimUSanteExoverrideBundle:ChartNew:show.html.twig" %}
+    {% if resourcelist == '' %}
+        <p><span class="fa fa-exclamation-triangle"></span> Please configure this widget to display results : click on <span class="fa fa-pencil"></span></p>
+    {% else %}
+        {% include "CPASimUSanteExoverrideBundle:ChartNew:show.html.twig" %}
+    {% endif %}
 {% else %}
     <div id="radarmessage"><span class="fa fa-exclamation-triangle"></span> You can't use this Widget</div>
 {% endif %}

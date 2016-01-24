@@ -27,7 +27,7 @@ class CPASimUSanteExoverrideBundle extends PluginBundle
 
     public function hasMigrations()
     {
-        return false;
+        return true;
     }
 
     public function getParent()

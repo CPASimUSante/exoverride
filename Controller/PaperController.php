@@ -1465,41 +1465,41 @@ $tmp[$eid]['user'][$k]['question'][$pid] = $paperresponse;
                     $htmltmp .= '<th>Moyenne dernier essai : '.number_format(($exercise['galmeanlast'])*100, 2).'%</th></tr>';
 
                     $htmltmp .= '<tr><td colspan="3">Questions : <ul>';
-                    foreach($exercise['question'] as $question)
-                    {
-                        $htmltmp .= '<li>'.$question['name'].'</li>';
+                    if (isset($exercise['question'])) {
+                        foreach ($exercise['question'] as $question) {
+                            $htmltmp .= '<li>' . $question['name'] . '</li>';
+                        }
                     }
                     $htmltmp .= '</ul></td></tr>';
-
-                    foreach($exercise['user'] as $u => $userdata)
-                    {
-                        $user[$u] = $userdata['uname'];
-                        $htmltmp .= '<tr><td><u>'.$userdata['uname'].'</u></td>';
-                        $htmltmp .= ' <td>Moyenne tous essais :  '.number_format(($exercise['user'][$u]['mean'])*100, 2).'%</td>
-                    <td>Moyenne dernier essai :  '.number_format(($exercise['avg_last'][$u])*100, 2).'%</td>
+                    if (isset($exercise['user'])) {
+                        foreach ($exercise['user'] as $u => $userdata) {
+                            $user[$u] = $userdata['uname'];
+                            $htmltmp .= '<tr><td><u>' . $userdata['uname'] . '</u></td>';
+                            $htmltmp .= ' <td>Moyenne tous essais :  ' . number_format(($exercise['user'][$u]['mean']) * 100, 2) . '%</td>
+                    <td>Moyenne dernier essai :  ' . number_format(($exercise['avg_last'][$u]) * 100, 2) . '%</td>
                     </tr>';
 
-                        $inc = 1;
-                        $htmltmp .= '<tr><td colspan="3">Réponse : <br>';
-                        foreach($userdata['mark'] as $p => $papermark)
-                        {
-                            $htmltmp .= 'Essai '.$inc.' ('.$userdata['start'][$p].' - '.$userdata['end'][$p].') => ';
-                            foreach($papermark as $m => $mark)
-                            {
-                                $htmltmp .= $userdata['question'][$p][$m] .' : '. number_format(($mark)*100, 2) .'%  - ';
+                            $inc = 1;
+                            $htmltmp .= '<tr><td colspan="3">Réponse : <br>';
+                            foreach ($userdata['mark'] as $p => $papermark) {
+                                $htmltmp .= 'Essai ' . $inc . ' (' . $userdata['start'][$p] . ' - ' . $userdata['end'][$p] . ') => ';
+                                foreach ($papermark as $m => $mark) {
+                                    $htmltmp .= $userdata['question'][$p][$m] . ' : ' . number_format(($mark) * 100, 2) . '%  - ';
+                                }
+                                $htmltmp .= '<br>';
+                                $inc++;
                             }
-                            $htmltmp .= '<br>';
-                            $inc++;
+                            $htmltmp .= '</td></tr>';
                         }
-                        $htmltmp .= '</td></tr>';
                     }
                 }
                 //Display mean
                 $mean = '';
-                foreach($exerciselist['mean'] as $u => $val)
-                {
-                    $mean .= '<tr><td><u>'.$user[$u] . '</u></td><td>' . number_format(($val)*100, 2).'%</td>'.
-                    '<td>' . number_format(($exerciselist['mean_last'][$u])*100, 2).'%</td></tr>';
+                if (isset($exerciselist['mean'])) {
+                    foreach ($exerciselist['mean'] as $u => $val) {
+                        $mean .= '<tr><td><u>' . $user[$u] . '</u></td><td>' . number_format(($val) * 100, 2) . '%</td>' .
+                            '<td>' . number_format(($exerciselist['mean_last'][$u]) * 100, 2) . '%</td></tr>';
+                    }
                 }
                 $meanlast='';
                 /*
@@ -1794,7 +1794,7 @@ $tmp[$eid]['user'][$k]['question'][$pid] = $paperresponse;
                         $usernames[$u] = $datas['user'][$u];
                         $user[$u]['name'] = $datas['user'][$u];
                         $user[$u]['mean'][] = number_format(($val)*100, 2);
-                        //TODO : remove this hacky shit ! save the realname for later
+                        //TODO : remove this hacky shit ! save the real username for later
                         $user[$u]['nameok'] = true;
                         //remove user
                         array_diff($userlisttmp, [$u]);
